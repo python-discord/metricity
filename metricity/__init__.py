@@ -1,3 +1,1 @@
-"""
-Metric collection for the Python Discord server.
-"""
+"""Metric collection for the Python Discord server."""
