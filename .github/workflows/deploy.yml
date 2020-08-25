@@ -23,3 +23,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
+
+  trigger_autodeploy:
+    name: Trigger Auto-Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: curl
+        uses: wei/curl@v1
+        with:
+          args: -X POST ${{ secrets.AUTODEPLOY_URL }}
