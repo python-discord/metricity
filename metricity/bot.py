@@ -121,7 +121,7 @@ async def on_guild_available(guild: Guild) -> None:
 
     log.info("Beginning user synchronisation process")
 
-    await User.update.values(in_guild=False)
+    await User.update.values(in_guild=False).gino.status()
 
     users = []
 
