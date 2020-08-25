@@ -248,7 +248,7 @@ async def on_message(message: DiscordMessage) -> None:
         created_at=message.created_at
     )
 
-    if message.channel.id in BotConfig.bot_commands_channel:
+    if message.channel.id == BotConfig.bot_commands_channel:
         await bot.process_commands(message)
 
 
