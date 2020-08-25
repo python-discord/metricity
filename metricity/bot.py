@@ -72,7 +72,7 @@ async def sync_channels(guild: Guild) -> None:
                         else False
                     )
                 )
-    
+
     channel_sync_in_progress.set()
 
 
@@ -193,7 +193,7 @@ async def on_member_update(_before: Member, member: Member):
 
     if db_user := await User.get(member.id):
         if (
-            db_user.name != member.name or 
+            db_user.name != member.name or
             db_user.avatar_hash != member.avatar or
             BotConfig.staff_role_id in
             [role.id for role in member.roles] != db_user.is_staff
