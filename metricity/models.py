@@ -13,7 +13,7 @@ class Category(db.Model):
 
     __tablename__ = "categories"
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
 
 
@@ -22,10 +22,10 @@ class Channel(db.Model):
 
     __tablename__ = "channels"
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     category_id = db.Column(
-        db.BigInteger,
+        db.String,
         db.ForeignKey("categories.id"),
         nullable=True
     )
@@ -37,7 +37,7 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     avatar_hash = db.Column(db.String, nullable=True)
     joined_at = db.Column(db.DateTime, nullable=False)
@@ -71,10 +71,10 @@ class Message(db.Model):
 
     __tablename__ = "messages"
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     channel_id = db.Column(
-        db.BigInteger,
+        db.String,
         db.ForeignKey("channels.id", ondelete="CASCADE"),
     )
-    author_id = db.Column(db.BigInteger, db.ForeignKey("users.id", ondelete="CASCADE"))
+    author_id = db.Column(db.String, db.ForeignKey("users.id", ondelete="CASCADE"))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

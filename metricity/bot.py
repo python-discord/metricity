@@ -34,10 +34,10 @@ async def sync_channels(guild: Guild) -> None:
 
     for channel in guild.channels:
         if isinstance(channel, CategoryChannel):
-            if db_cat := await Category.get(channel.id):
+            if db_cat := await Category.get(str(channel.id)):
                 await db_cat.update(name=channel.name).apply()
             else:
-                await Category.create(id=channel.id, name=channel.name)
+                await Category.create(id=str(channel.id), name=channel.name)
 
     log.info("Category synchronisation process complete, synchronising channels")
 
@@ -50,11 +50,10 @@ async def sync_channels(guild: Guild) -> None:
             not isinstance(channel, CategoryChannel) and
             not isinstance(channel, VoiceChannel)
         ):
-            if db_chan := await Channel.get(channel.id):
+            if db_chan := await Channel.get(str(channel.id)):
                 await db_chan.update(
-                    id=channel.id,
                     name=channel.name,
-                    category_id=channel.category.id if channel.category else None,
+                    category_id=str(channel.category.id) if channel.category else None,
                     is_staff=(
                         True
                         if channel.category.id in BotConfig.staff_categories
@@ -63,9 +62,9 @@ async def sync_channels(guild: Guild) -> None:
                 ).apply()
             else:
                 await Channel.create(
-                    id=channel.id,
+                    id=str(channel.id),
                     name=channel.name,
-                    category_id=channel.category.id if channel.category else None,
+                    category_id=str(channel.category.id) if channel.category else None,
                     is_staff=(
                         True
                         if channel.category.id in BotConfig.staff_categories
@@ -126,7 +125,7 @@ async def on_guild_available(guild: Guild) -> None:
 
     for user in guild.members:
         users.append({
-            "id": user.id,
+            "id": str(user.id),
             "name": user.name,
             "avatar_hash": user.avatar,
             "joined_at": user.joined_at,
@@ -156,9 +155,9 @@ async def on_member_join(member: Member) -> None:
     if member.guild.id != BotConfig.guild_id:
         return
 
-    if db_user := await User.get(member.id):
+    if db_user := await User.get(str(member.id)):
         await db_user.update(
-            id=member.id,
+            id=str(member.id),
             name=member.name,
             avatar_hash=member.avatar,
             joined_at=member.joined_at,
@@ -168,7 +167,7 @@ async def on_member_join(member: Member) -> None:
     else:
         try:
             await User.create(
-                id=member.id,
+                id=str(member.id),
                 name=member.name,
                 avatar_hash=member.avatar,
                 joined_at=member.joined_at,
@@ -191,7 +190,7 @@ async def on_member_update(_before: Member, member: Member) -> None:
     if not member.joined_at:
         return
 
-    if db_user := await User.get(member.id):
+    if db_user := await User.get(str(member.id)):
         if (
             db_user.name != member.name or
             db_user.avatar_hash != member.avatar or
@@ -199,7 +198,7 @@ async def on_member_update(_before: Member, member: Member) -> None:
             [role.id for role in member.roles] != db_user.is_staff
         ):
             await db_user.update(
-                id=member.id,
+                id=str(member.id),
                 name=member.name,
                 avatar_hash=member.avatar,
                 joined_at=member.joined_at,
@@ -209,7 +208,7 @@ async def on_member_update(_before: Member, member: Member) -> None:
     else:
         try:
             await User.create(
-                id=member.id,
+                id=str(member.id),
                 name=member.name,
                 avatar_hash=member.avatar,
                 joined_at=member.joined_at,
@@ -231,7 +230,7 @@ async def on_message(message: DiscordMessage) -> None:
 
     await channel_sync_in_progress.wait()
 
-    if author := await User.get(message.author.id):
+    if author := await User.get(str(message.author.id)):
         if author.opt_out:
             return
     else:
@@ -243,8 +242,8 @@ async def on_message(message: DiscordMessage) -> None:
         return
 
     await Message.create(
-        id=message.id,
-        channel_id=message.channel.id,
-        author_id=message.author.id,
+        id=str(message.id),
+        channel_id=str(message.channel.id),
+        author_id=str(message.author.id),
         created_at=message.created_at
     )
