@@ -7,6 +7,8 @@ ENV PYTHONFAULTHANDLER=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100
 
+RUN pip install poetry
+
 WORKDIR /metricity
 COPY poetry.lock pyproject.toml /metricity/
 
