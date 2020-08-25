@@ -222,6 +222,9 @@ async def on_member_update(_before: Member, member: Member) -> None:
 @bot.event
 async def on_message(message: DiscordMessage) -> None:
     """Add a message to the table when one is sent providing the author has accepted."""
+    if message.channel.id == BotConfig.bot_commands_channel:
+        await bot.process_commands(message)
+
     if not message.guild:
         return
 
@@ -247,10 +250,6 @@ async def on_message(message: DiscordMessage) -> None:
         author_id=str(message.author.id),
         created_at=message.created_at
     )
-
-    if message.channel.id == BotConfig.bot_commands_channel:
-        await bot.process_commands(message)
-
 
 @bot.command()
 async def opt_in(ctx: Context) -> None:
