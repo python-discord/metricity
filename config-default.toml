@@ -1,0 +1,53 @@
+# If a value is set to a dictionary with a key named env the variable is replaced
+# at runtime with the value specified in that environment variable. If the variable
+# also has an optional attribute set then it will be set as None if no environment
+# variable is set.
+
+[python]
+# Sets the root log level.
+log_level = "INFO"
+
+# Sets the logging level used for discord.py, DEBUG is not recommended even in local setups.
+discord_log_level = "INFO"
+
+[bot]
+# The prefixes Metricity respond to.
+command_prefix = ["m!"]
+
+# The token Metricity will use to authenticate with Discord.
+token = { env = "BOT_TOKEN" }
+
+# The guild ID that Metricity should be reporting about
+guild_id = 267624335836053506
+
+# This is the role ID of the role that should identify staff members, for Python Discord this is the helper ID
+staff_role_id = 267630620367257601
+
+# Channels that should be flagged as staff only by category ID
+staff_categories = [
+    468520609152892958,
+    732695657587933304,
+    364918151625965579,
+    551815583788695562,
+    721459859500957726,
+    430484673248886784
+]
+
+ignore_categories = [
+    714494672835444826
+]
+
+[database]
+# Postgres!
+
+# If a database URI is passed in the "uri" variable it will override any specifics passed
+
+uri = { env = "DATABASE_URI", optional = true }
+
+# Otherwise, the below configuration options should be specified
+
+host = "127.0.0.1"
+port = 5432
+database = "metricity"
+username = "postgres"
+password = "postgres"
