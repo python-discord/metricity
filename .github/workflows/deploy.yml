@@ -28,6 +28,8 @@ jobs:
     name: Trigger Auto-Deploy
     runs-on: ubuntu-latest
 
+    needs: [push_docker_image]
+
     steps:
       - name: curl
         uses: wei/curl@v1
