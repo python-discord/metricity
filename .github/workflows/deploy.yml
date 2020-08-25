@@ -14,12 +14,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build Docker image
-        run: docker build . --file Dockerfile -t python-discord/metricity/metricity:${{ github.sha }}
+        run: docker build . --file Dockerfile -t python-discord/metricity/metricity:latest
 
       - name: Publish Docker image
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: python-discord/metricity/metricity:${{ github.sha }}
+          name: python-discord/metricity/metricity:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
