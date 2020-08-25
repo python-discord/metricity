@@ -33,9 +33,13 @@ staff_categories = [
     430484673248886784
 ]
 
+# Don't report messages for the following categories
 ignore_categories = [
     714494672835444826
 ]
+
+# Respond to opt-in/opt-out commands in the following channel
+bot_commands_channel = 267659945086812160
 
 [database]
 # Postgres!

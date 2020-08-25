@@ -10,7 +10,7 @@ from discord import (
     Message as DiscordMessage, VoiceChannel
 )
 from discord.abc import Messageable
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, Context
 
 from metricity.config import BotConfig
 from metricity.database import connect
@@ -247,3 +247,47 @@ async def on_message(message: DiscordMessage) -> None:
         author_id=str(message.author.id),
         created_at=message.created_at
     )
+
+    if message.channel.id in BotConfig.bot_commands_channel:
+        await bot.process_commands(message)
+
+
+@bot.command()
+async def opt_in(ctx: Context) -> None:
+    """Opt-in to the server analytics system."""
+    user = await User.get(str(ctx.author.id))
+
+    if not user:
+        return await ctx.send(
+            f"Sorry {ctx.author.mention}, I don't have a record for you yet"
+            " which probably means you joined recently enough to have missed"
+            " the user synchronisation. Please check back soon or contact"
+            " `joe#1337` for additional help."
+        )
+
+    await user.update(opt_out=False).apply()
+
+    await ctx.send("Your preferences have been updated.")
+
+
+@bot.command()
+async def opt_out(ctx: Context) -> None:
+    """
+    Opt-out to the server analytics system.
+
+    This only disables message reporting, user information is kept
+    in accordance with our privacy policy.
+    """
+    user = await User.get(str(ctx.author.id))
+
+    if not user:
+        return await ctx.send(
+            f"Sorry {ctx.author.mention}, I don't have a record for you yet"
+            " which probably means you joined recently enough to have missed"
+            " the user synchronisation. Please check back soon or contact"
+            " `joe#1337` for additional help."
+        )
+
+    await user.update(opt_out=True).apply()
+
+    await ctx.send("Your preferences have been updated.")

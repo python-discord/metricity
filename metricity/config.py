@@ -118,6 +118,8 @@ class BotConfig(metaclass=ConfigSection):
     staff_categories: List[int]
     ignore_categories: List[int]
 
+    bot_commands_channel: int
+
 
 class DatabaseConfig(metaclass=ConfigSection):
     """Configuration about the database Metricity will use."""
