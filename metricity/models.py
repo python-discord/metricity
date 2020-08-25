@@ -57,7 +57,6 @@ class User(db.Model):
             "avatar_hash",
             "joined_at",
             "is_staff",
-            "opt_out",
             "bot",
             "in_guild"
         ]
