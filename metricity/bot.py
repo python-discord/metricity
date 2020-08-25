@@ -149,7 +149,7 @@ async def on_guild_available(guild: Guild) -> None:
 
 
 @bot.event
-async def on_member_join(member: Member):
+async def on_member_join(member: Member) -> None:
     """On a user joining the server add them to the database."""
     await sync_process_complete.wait()
 
@@ -180,7 +180,7 @@ async def on_member_join(member: Member):
 
 
 @bot.event
-async def on_member_update(_before: Member, member: Member):
+async def on_member_update(_before: Member, member: Member) -> None:
     """When a member updates their profile, update the DB record."""
     await sync_process_complete.wait()
 

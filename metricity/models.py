@@ -44,6 +44,7 @@ class User(db.Model):
 
     @classmethod
     def bulk_upsert(cls: type, users: List[Dict[str, Any]]) -> Any:
+        """Perform a bulk insert/update of the database to sync the user table."""
         qs = insert(cls.__table__).values(users)
 
         update_cols = [
