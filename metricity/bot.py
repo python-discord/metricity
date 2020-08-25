@@ -251,6 +251,7 @@ async def on_message(message: DiscordMessage) -> None:
         created_at=message.created_at
     )
 
+
 @bot.command()
 async def opt_in(ctx: Context) -> None:
     """Opt-in to the server analytics system."""
