@@ -24,7 +24,11 @@ class Channel(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    category_id = db.Column(db.BigInteger, nullable=True)
+    category_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey("categories.id"),
+        nullable=True
+    )
     is_staff = db.Column(db.Boolean, nullable=False)
 
 
