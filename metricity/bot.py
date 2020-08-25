@@ -121,6 +121,8 @@ async def on_guild_available(guild: Guild) -> None:
 
     log.info("Beginning user synchronisation process")
 
+    await User.update.values(in_guild=False)
+
     users = []
 
     for user in guild.members:
@@ -131,7 +133,8 @@ async def on_guild_available(guild: Guild) -> None:
             "joined_at": user.joined_at,
             "created_at": user.created_at,
             "is_staff": BotConfig.staff_role_id in [role.id for role in user.roles],
-            "bot": user.bot
+            "bot": user.bot,
+            "in_guild": True
         })
 
     log.info(f"Performing bulk upsert of {len(users)} rows")
@@ -176,6 +179,20 @@ async def on_member_join(member: Member) -> None:
             )
         except UniqueViolationError:
             pass
+
+
+@bot.event
+async def on_member_remove(member: Member) -> None:
+    """On a user leaving the server mark in_guild as False."""
+    await sync_process_complete.wait()
+
+    if member.guild.id != BotConfig.guild_id:
+        return
+
+    if db_user := await User.get(str(member.id)):
+        await db_user.update(
+            in_guild=False
+        ).apply()
 
 
 @bot.event
@@ -231,6 +248,7 @@ async def on_message(message: DiscordMessage) -> None:
     if message.guild.id != BotConfig.guild_id:
         return
 
+    await sync_process_complete.wait()
     await channel_sync_in_progress.wait()
 
     if author := await User.get(str(message.author.id)):
