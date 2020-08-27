@@ -24,7 +24,7 @@ bot = Bot(
 
 sync_process_complete = asyncio.Event()
 channel_sync_in_progress = asyncio.Event()
-
+db_ready = asyncio.Event()
 
 async def sync_channels(guild: Guild) -> None:
     """Sync channels and categories with the database."""
@@ -89,11 +89,14 @@ async def on_ready() -> None:
     """Initiate tasks when the bot comes online."""
     log.info(f"Metricity is online, logged in as {bot.user}")
     await connect()
+    db_ready.set()
 
 
 @bot.event
 async def on_guild_channel_create(channel: Messageable) -> None:
     """Sync the channels when one is created."""
+    await db_ready.wait()
+
     if channel.guild.id != BotConfig.guild_id:
         return
 
@@ -103,6 +106,8 @@ async def on_guild_channel_create(channel: Messageable) -> None:
 @bot.event
 async def on_guild_channel_update(_before: Messageable, channel: Messageable) -> None:
     """Sync the channels when one is updated."""
+    await db_ready.wait()
+
     if channel.guild.id != BotConfig.guild_id:
         return
 
@@ -112,6 +117,8 @@ async def on_guild_channel_update(_before: Messageable, channel: Messageable) ->
 @bot.event
 async def on_guild_available(guild: Guild) -> None:
     """Synchronize the user table with the Discord users."""
+    await db_ready.wait()
+
     log.info(f"Received guild available for {guild.id}")
 
     if guild.id != BotConfig.guild_id:
@@ -153,6 +160,7 @@ async def on_guild_available(guild: Guild) -> None:
 @bot.event
 async def on_member_join(member: Member) -> None:
     """On a user joining the server add them to the database."""
+    await db_ready.wait()
     await sync_process_complete.wait()
 
     if member.guild.id != BotConfig.guild_id:
@@ -184,6 +192,7 @@ async def on_member_join(member: Member) -> None:
 @bot.event
 async def on_member_remove(member: Member) -> None:
     """On a user leaving the server mark in_guild as False."""
+    await db_ready.wait()
     await sync_process_complete.wait()
 
     if member.guild.id != BotConfig.guild_id:
@@ -239,6 +248,8 @@ async def on_member_update(_before: Member, member: Member) -> None:
 @bot.event
 async def on_message(message: DiscordMessage) -> None:
     """Add a message to the table when one is sent providing the author has accepted."""
+    await db_ready.wait()
+
     if message.channel.id == BotConfig.bot_commands_channel:
         await bot.process_commands(message)
 
