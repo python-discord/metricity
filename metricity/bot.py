@@ -26,6 +26,7 @@ sync_process_complete = asyncio.Event()
 channel_sync_in_progress = asyncio.Event()
 db_ready = asyncio.Event()
 
+
 async def sync_channels(guild: Guild) -> None:
     """Sync channels and categories with the database."""
     channel_sync_in_progress.clear()
