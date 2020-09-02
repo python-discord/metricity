@@ -144,6 +144,7 @@ async def on_guild_available(guild: Guild) -> None:
             "bot": user.bot,
             "in_guild": True,
             "is_verified": BotConfig.role_gate_id in [role.id for role in user.roles],
+            "public_flags": dict(user.public_flags)
         })
 
     log.info(f"Performing bulk upsert of {len(users)} rows")
@@ -176,7 +177,8 @@ async def on_member_join(member: Member) -> None:
             joined_at=member.joined_at,
             created_at=member.created_at,
             is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-            is_verified=False
+            is_verified=False,
+            public_flags=member.public_flags
         ).apply()
     else:
         try:
@@ -187,7 +189,8 @@ async def on_member_join(member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-                is_verified=False
+                is_verified=False,
+                public_flags=member.public_flags
             )
         except UniqueViolationError:
             pass
@@ -236,7 +239,8 @@ async def on_member_update(_before: Member, member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
-                is_verified=BotConfig.role_gate_id in roles
+                is_verified=BotConfig.role_gate_id in roles,
+                public_flags=member.public_flags
             ).apply()
     else:
         try:
@@ -247,7 +251,8 @@ async def on_member_update(_before: Member, member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
-                is_verified=BotConfig.role_gate_id in roles
+                is_verified=BotConfig.role_gate_id in roles,
+                public_flags=member.public_flags
             )
         except UniqueViolationError:
             pass

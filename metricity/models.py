@@ -47,6 +47,7 @@ class User(db.Model):
     bot = db.Column(db.Boolean, default=False)
     in_guild = db.Column(db.Boolean, default=True)
     is_verified = db.Column(db.Boolean, default=False)
+    public_flags = db.Column(db.JSON, default={})
 
     @classmethod
     def bulk_upsert(cls: type, users: List[Dict[str, Any]]) -> Any:
@@ -60,7 +61,8 @@ class User(db.Model):
             "is_staff",
             "bot",
             "in_guild",
-            "is_verified"
+            "is_verified",
+            "public_flags",
         ]
 
         return qs.on_conflict_do_update(
