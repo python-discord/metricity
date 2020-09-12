@@ -1,6 +1,7 @@
 """Creating and configuring a Discord client for Metricity."""
 
 import asyncio
+from datetime import datetime
 import logging
 from typing import Any, Generator, List
 
@@ -212,7 +213,7 @@ async def on_member_remove(member: Member) -> None:
 
 
 @bot.event
-async def on_member_update(_before: Member, member: Member) -> None:
+async def on_member_update(before: Member, member: Member) -> None:
     """When a member updates their profile, update the DB record."""
     await sync_process_complete.wait()
 
@@ -222,6 +223,16 @@ async def on_member_update(_before: Member, member: Member) -> None:
     # Joined at will be null if we are not ready to process events yet
     if not member.joined_at:
         return
+
+    before_roles = set([r.id for r in before.roles])
+    after_roles = set([r.id for r in member.roles])
+
+    diff = after_roles - before_roles
+
+    verified_at = None
+
+    if BotConfig.role_gate_id in diff:
+        verified_at = datetime.now()
 
     roles = set([role.id for role in member.roles])
 
@@ -240,7 +251,8 @@ async def on_member_update(_before: Member, member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
                 is_verified=BotConfig.role_gate_id in roles,
-                public_flags=dict(member.public_flags)
+                public_flags=dict(member.public_flags),
+                verified_at=verified_at or db_user.verified_at
             ).apply()
     else:
         try:
