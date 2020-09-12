@@ -232,7 +232,7 @@ async def on_member_update(before: Member, member: Member) -> None:
     verified_at = None
 
     if BotConfig.role_gate_id in diff:
-        verified_at = datetime.now()
+        verified_at = datetime.utcnow()
 
     roles = set([role.id for role in member.roles])
 
@@ -242,6 +242,8 @@ async def on_member_update(before: Member, member: Member) -> None:
             db_user.avatar_hash != member.avatar or
             BotConfig.staff_role_id in
             [role.id for role in member.roles] != db_user.is_staff
+            or verified_at
+            or BotConfig.role_gate_id in roles != db_user.is_verified
         ):
             await db_user.update(
                 id=str(member.id),
