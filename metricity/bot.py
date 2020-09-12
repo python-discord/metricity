@@ -1,8 +1,8 @@
 """Creating and configuring a Discord client for Metricity."""
 
 import asyncio
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Any, Generator, List
 
 from asyncpg.exceptions import UniqueViolationError
