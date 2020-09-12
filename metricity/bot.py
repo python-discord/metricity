@@ -264,7 +264,8 @@ async def on_member_update(before: Member, member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
                 is_verified=BotConfig.role_gate_id in roles,
-                public_flags=dict(member.public_flags)
+                public_flags=dict(member.public_flags),
+                verified_at=verified_at
             )
         except UniqueViolationError:
             pass
