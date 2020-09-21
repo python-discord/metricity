@@ -150,7 +150,7 @@ async def on_guild_available(guild: Guild) -> None:
 
     log.info(f"Performing bulk upsert of {len(users)} rows")
 
-    user_chunks = gen_chunks(users, 2500)
+    user_chunks = gen_chunks(users, 500)
 
     for chunk in user_chunks:
         log.info(f"Upserting chunk of {len(chunk)}")
