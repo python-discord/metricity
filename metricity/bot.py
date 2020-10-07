@@ -20,7 +20,7 @@ from metricity.models import Category, Channel, Message, User
 log = logging.getLogger(__name__)
 
 intents = Intents.all(
-    guilds=True,
+    guild=True,
     members=True,
     bans=False,
     emojis=False,
