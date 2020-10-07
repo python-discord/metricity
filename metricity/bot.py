@@ -7,7 +7,7 @@ from typing import Any, Generator, List
 
 from asyncpg.exceptions import UniqueViolationError
 from discord import (
-    CategoryChannel, Guild, Member,
+    CategoryChannel, Guild, Intents, Member,
     Message as DiscordMessage, VoiceChannel
 )
 from discord.abc import Messageable
@@ -19,8 +19,26 @@ from metricity.models import Category, Channel, Message, User
 
 log = logging.getLogger(__name__)
 
+intents = Intents.all(
+    guilds=True,
+    members=True,
+    bans=False,
+    emojis=False,
+    integrations=False,
+    webhooks=False,
+    invites=False,
+    voice_states=False,
+    presences=False,
+    messages=True,
+    reactions=False,
+    typing=False
+)
+
+
 bot = Bot(
-    command_prefix=BotConfig.command_prefix
+    command_prefix=BotConfig.command_prefix,
+    intents=intents,
+    max_messages=None
 )
 
 sync_process_complete = asyncio.Event()
