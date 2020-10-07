@@ -1,5 +1,8 @@
 FROM python:slim
 
+RUN apt update
+RUN apt install -y gcc
+
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONHASHSEED=random \
