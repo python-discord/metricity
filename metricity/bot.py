@@ -8,7 +8,8 @@ from typing import Any, Generator, List
 from asyncpg.exceptions import UniqueViolationError
 from discord import (
     CategoryChannel, Guild, Intents, Member,
-    Message as DiscordMessage, VoiceChannel
+    Message as DiscordMessage, VoiceChannel,
+    RawMessageDeleteEvent
 )
 from discord.abc import Messageable
 from discord.ext.commands import Bot, Context
@@ -326,10 +327,12 @@ async def on_message(message: DiscordMessage) -> None:
         created_at=message.created_at
     )
 
+
 @bot.event
-async def on_raw_message_delete(message):
+async def on_raw_message_delete(message: RawMessageDeleteEvent) -> None:
     if message := await Message.get(str(message.message_id)):
         await message.update(is_deleted=True).apply()
+
 
 @bot.command()
 async def opt_in(ctx: Context) -> None:
