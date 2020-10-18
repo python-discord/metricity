@@ -84,3 +84,4 @@ class Message(db.Model):
     )
     author_id = db.Column(db.String, db.ForeignKey("users.id", ondelete="CASCADE"))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)

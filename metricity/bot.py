@@ -326,6 +326,10 @@ async def on_message(message: DiscordMessage) -> None:
         created_at=message.created_at
     )
 
+@bot.event
+async def on_raw_message_delete(message):
+    if message := await Message.get(str(message.message_id)):
+        await message.update(is_deleted=True).apply()
 
 @bot.command()
 async def opt_in(ctx: Context) -> None:
