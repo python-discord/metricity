@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metricity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metricity
+  template:
+    metadata:
+      labels:
+        app: metricity
+    spec:
+      containers:
+        - name: metricity
+          image: ghcr.io/python-discord/metricity:latest
+          imagePullPolicy: "Always"
+          envFrom:
+            - secretRef:
+                name: metricity-env
