@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v
-
       - name: Create SHA Container Tag
         id: sha_tag
         run: |
