@@ -330,9 +330,7 @@ async def on_message(message: DiscordMessage) -> None:
 
 @bot.event
 async def on_raw_message_delete(message: RawMessageDeleteEvent) -> None:
-    """
-    If a message is deleted and we have a record of it set the is_deleted flag.
-    """
+    """If a message is deleted and we have a record of it set the is_deleted flag."""
     if message := await Message.get(str(message.message_id)):
         await message.update(is_deleted=True).apply()
 
