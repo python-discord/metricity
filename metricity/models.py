@@ -83,6 +83,10 @@ class Message(db.Model):
         db.ForeignKey("channels.id", ondelete="CASCADE"),
         index=True
     )
-    author_id = db.Column(db.String, db.ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    author_id = db.Column(
+        db.String,
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        index=True
+    )
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_deleted = db.Column(db.Boolean, default=False)
