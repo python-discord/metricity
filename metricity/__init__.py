@@ -7,6 +7,8 @@ import coloredlogs
 from metricity.__main__ import start  # noqa: F401
 from metricity.config import PythonConfig
 
+__version__ = "1.0.1"
+
 # Set root log level
 logging.basicConfig(level=PythonConfig.log_level)
 coloredlogs.install(level=PythonConfig.log_level)

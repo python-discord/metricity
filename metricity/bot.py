@@ -7,13 +7,14 @@ from typing import Any, Generator, List
 
 from asyncpg.exceptions import UniqueViolationError
 from discord import (
-    CategoryChannel, Guild, Intents,
+    CategoryChannel, Game, Guild, Intents,
     Member, Message as DiscordMessage, RawMessageDeleteEvent,
     VoiceChannel
 )
 from discord.abc import Messageable
 from discord.ext.commands import Bot, Context
 
+from metricity import __version__
 from metricity.config import BotConfig
 from metricity.database import connect
 from metricity.models import Category, Channel, Message, User
@@ -39,7 +40,8 @@ intents = Intents(
 bot = Bot(
     command_prefix=BotConfig.command_prefix,
     intents=intents,
-    max_messages=None
+    max_messages=None,
+    activity=Game(f"Metricity {__version__}")
 )
 
 sync_process_complete = asyncio.Event()
