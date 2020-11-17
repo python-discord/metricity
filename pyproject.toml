@@ -23,7 +23,7 @@ flake8-docstrings = "^1.5.0"
 flake8-import-order = "^0.18.1"
 
 [tool.poetry.scripts]
-start = "metricity:start"
+start = "metricity.__main__:start"
 
 [build-system]
 requires = ["poetry>=0.12"]

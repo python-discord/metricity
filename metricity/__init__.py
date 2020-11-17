@@ -4,7 +4,6 @@ import logging
 
 import coloredlogs
 
-from metricity.__main__ import start  # noqa: F401
 from metricity.config import PythonConfig
 
 __version__ = "1.0.1"
