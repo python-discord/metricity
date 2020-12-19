@@ -6,7 +6,7 @@ import coloredlogs
 
 from metricity.config import PythonConfig
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 # Set root log level
 logging.basicConfig(level=PythonConfig.log_level)
