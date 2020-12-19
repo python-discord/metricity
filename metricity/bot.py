@@ -304,7 +304,7 @@ async def on_message(message: DiscordMessage) -> None:
 
     if not message.guild:
         return
-    
+
     if message.author.bot:
         return
 
