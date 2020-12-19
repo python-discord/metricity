@@ -286,6 +286,9 @@ async def on_message(message: DiscordMessage) -> None:
     if not message.guild:
         return
 
+    if message.author.bot:
+        return
+
     if message.guild.id != BotConfig.guild_id:
         return
 
@@ -328,7 +331,7 @@ async def opt_in(ctx: Context) -> None:
             f"Sorry {ctx.author.mention}, I don't have a record for you yet"
             " which probably means you joined recently enough to have missed"
             " the user synchronisation. Please check back soon or contact"
-            " `joe#1337` for additional help."
+            " `joe#6000` for additional help."
         )
 
     await user.update(opt_out=False).apply()
@@ -351,7 +354,7 @@ async def opt_out(ctx: Context) -> None:
             f"Sorry {ctx.author.mention}, I don't have a record for you yet"
             " which probably means you joined recently enough to have missed"
             " the user synchronisation. Please check back soon or contact"
-            " `joe#1337` for additional help."
+            " `joe#6000` for additional help."
         )
 
     await user.update(opt_out=True).apply()
