@@ -165,7 +165,6 @@ async def on_guild_available(guild: Guild) -> None:
             "is_staff": BotConfig.staff_role_id in [role.id for role in user.roles],
             "bot": user.bot,
             "in_guild": True,
-            "is_verified": BotConfig.role_gate_id in [role.id for role in user.roles],
             "public_flags": dict(user.public_flags)
         })
 
@@ -199,7 +198,6 @@ async def on_member_join(member: Member) -> None:
             joined_at=member.joined_at,
             created_at=member.created_at,
             is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-            is_verified=False,
             public_flags=dict(member.public_flags)
         ).apply()
     else:
@@ -211,7 +209,6 @@ async def on_member_join(member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-                is_verified=False,
                 public_flags=dict(member.public_flags)
             )
         except UniqueViolationError:
@@ -245,16 +242,6 @@ async def on_member_update(before: Member, member: Member) -> None:
     if not member.joined_at:
         return
 
-    before_roles = set([r.id for r in before.roles])
-    after_roles = set([r.id for r in member.roles])
-
-    diff = after_roles - before_roles
-
-    verified_at = None
-
-    if BotConfig.role_gate_id in diff:
-        verified_at = datetime.utcnow()
-
     roles = set([role.id for role in member.roles])
 
     if db_user := await User.get(str(member.id)):
@@ -263,8 +250,6 @@ async def on_member_update(before: Member, member: Member) -> None:
             db_user.avatar_hash != member.avatar or
             BotConfig.staff_role_id in
             [role.id for role in member.roles] != db_user.is_staff
-            or verified_at
-            or BotConfig.role_gate_id in roles != db_user.is_verified
         ):
             await db_user.update(
                 id=str(member.id),
@@ -273,9 +258,7 @@ async def on_member_update(before: Member, member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
-                is_verified=BotConfig.role_gate_id in roles,
                 public_flags=dict(member.public_flags),
-                verified_at=verified_at or db_user.verified_at
             ).apply()
     else:
         try:
@@ -286,9 +269,7 @@ async def on_member_update(before: Member, member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
-                is_verified=BotConfig.role_gate_id in roles,
                 public_flags=dict(member.public_flags),
-                verified_at=verified_at
             )
         except UniqueViolationError:
             pass

@@ -43,9 +43,6 @@ ignore_categories = [
 # Respond to opt-in/opt-out commands in the following channel
 bot_commands_channel = 267659945086812160
 
-# Role ID that is used as a role gate on the server
-role_gate_id = 352427296948486144
-
 [database]
 # Postgres!
 

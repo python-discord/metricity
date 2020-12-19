@@ -46,9 +46,7 @@ class User(db.Model):
     opt_out = db.Column(db.Boolean, default=False)
     bot = db.Column(db.Boolean, default=False)
     in_guild = db.Column(db.Boolean, default=True)
-    is_verified = db.Column(db.Boolean, default=False)
     public_flags = db.Column(db.JSON, default={})
-    verified_at = db.Column(db.DateTime, nullable=True)
 
     @classmethod
     def bulk_upsert(cls: type, users: List[Dict[str, Any]]) -> Any:
@@ -62,7 +60,6 @@ class User(db.Model):
             "is_staff",
             "bot",
             "in_guild",
-            "is_verified",
             "public_flags"
         ]
 

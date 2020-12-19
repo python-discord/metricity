@@ -114,7 +114,6 @@ class BotConfig(metaclass=ConfigSection):
 
     guild_id: int
     staff_role_id: int
-    role_gate_id: int
 
     staff_categories: List[int]
     ignore_categories: List[int]
