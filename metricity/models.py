@@ -47,6 +47,7 @@ class User(db.Model):
     bot = db.Column(db.Boolean, default=False)
     in_guild = db.Column(db.Boolean, default=True)
     public_flags = db.Column(db.JSON, default={})
+    pending = db.Column(db.Boolean, default=False)
 
     @classmethod
     def bulk_upsert(cls: type, users: List[Dict[str, Any]]) -> Any:
@@ -60,7 +61,8 @@ class User(db.Model):
             "is_staff",
             "bot",
             "in_guild",
-            "public_flags"
+            "public_flags",
+            "pending"
         ]
 
         return qs.on_conflict_do_update(

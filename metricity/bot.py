@@ -164,7 +164,8 @@ async def on_guild_available(guild: Guild) -> None:
             "is_staff": BotConfig.staff_role_id in [role.id for role in user.roles],
             "bot": user.bot,
             "in_guild": True,
-            "public_flags": dict(user.public_flags)
+            "public_flags": dict(user.public_flags),
+            "pending": user.pending
         })
 
     log.info(f"Performing bulk upsert of {len(users)} rows")
@@ -197,7 +198,8 @@ async def on_member_join(member: Member) -> None:
             joined_at=member.joined_at,
             created_at=member.created_at,
             is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-            public_flags=dict(member.public_flags)
+            public_flags=dict(member.public_flags),
+            pending=member.pending
         ).apply()
     else:
         try:
@@ -208,7 +210,8 @@ async def on_member_join(member: Member) -> None:
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-                public_flags=dict(member.public_flags)
+                public_flags=dict(member.public_flags),
+                pending=member.pending
             )
         except UniqueViolationError:
             pass
@@ -249,6 +252,7 @@ async def on_member_update(before: Member, member: Member) -> None:
             db_user.avatar_hash != member.avatar or
             BotConfig.staff_role_id in
             [role.id for role in member.roles] != db_user.is_staff
+            or db_user.pending is not member.pending
         ):
             await db_user.update(
                 id=str(member.id),
@@ -258,6 +262,7 @@ async def on_member_update(before: Member, member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
                 public_flags=dict(member.public_flags),
+                pending=member.pending
             ).apply()
     else:
         try:
@@ -269,6 +274,7 @@ async def on_member_update(before: Member, member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
                 public_flags=dict(member.public_flags),
+                pending=member.pending
             )
         except UniqueViolationError:
             pass
