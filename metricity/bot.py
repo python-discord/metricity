@@ -199,7 +199,8 @@ async def on_member_join(member: Member) -> None:
             created_at=member.created_at,
             is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
             public_flags=dict(member.public_flags),
-            pending=member.pending
+            pending=member.pending,
+            in_guild=True
         ).apply()
     else:
         try:
@@ -211,7 +212,8 @@ async def on_member_join(member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
                 public_flags=dict(member.public_flags),
-                pending=member.pending
+                pending=member.pending,
+                in_guild=True
             )
         except UniqueViolationError:
             pass
@@ -262,6 +264,7 @@ async def on_member_update(before: Member, member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
                 public_flags=dict(member.public_flags),
+                in_guild=True,
                 pending=member.pending
             ).apply()
     else:
@@ -274,6 +277,7 @@ async def on_member_update(before: Member, member: Member) -> None:
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
                 public_flags=dict(member.public_flags),
+                in_guild=True,
                 pending=member.pending
             )
         except UniqueViolationError:
