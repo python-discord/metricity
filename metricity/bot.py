@@ -7,7 +7,7 @@ from typing import Any, Generator, List
 from asyncpg.exceptions import UniqueViolationError
 from discord import (
     CategoryChannel, Game, Guild, Intents,
-    Member, Message as DiscordMessage, RawMessageDeleteEvent,
+    Member, Message as DiscordMessage, RawBulkMessageDeleteEvent, RawMessageDeleteEvent,
     VoiceChannel
 )
 from discord.abc import Messageable
@@ -328,6 +328,14 @@ async def on_raw_message_delete(message: RawMessageDeleteEvent) -> None:
     """If a message is deleted and we have a record of it set the is_deleted flag."""
     if message := await Message.get(str(message.message_id)):
         await message.update(is_deleted=True).apply()
+
+
+@bot.event
+async def on_raw_bulk_message_delete(messages: RawBulkMessageDeleteEvent) -> None:
+    """If messages are deleted in bulk and we have a record of them set the is_deleted flag."""
+    for message_id in messages.message_ids:
+        if message := await Message.get(str(message_id)):
+            await message.update(is_deleted=True).apply()
 
 
 @bot.command()
