@@ -26,7 +26,7 @@ class Channel(db.Model):
     name = db.Column(db.String, nullable=False)
     category_id = db.Column(
         db.String,
-        db.ForeignKey("categories.id"),
+        db.ForeignKey("categories.id", ondelete="CASCADE"),
         nullable=True
     )
     is_staff = db.Column(db.Boolean, nullable=False)
