@@ -2,9 +2,9 @@ name: Lint Python code
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   lint:
@@ -17,15 +17,15 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout branch
       uses: actions/checkout@v2
-    
+
     - name: Setup Python
       uses: actions/setup-python@v2
-    
+
     - name: Install Poetry and project dependencies
       uses: knowsuchagency/poetry-install@v2
-    
+
     - name: Setup flake8 annotations
       uses: rbialon/flake8-annotations@v1
-    
+
     - name: Lint code with Flake8
       run: poetry run flake8 . --count --show-source --statistics
