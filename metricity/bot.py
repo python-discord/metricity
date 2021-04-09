@@ -304,10 +304,7 @@ async def on_message(message: DiscordMessage) -> None:
     await sync_process_complete.wait()
     await channel_sync_in_progress.wait()
 
-    if author := await User.get(str(message.author.id)):
-        if author.opt_out:
-            return
-    else:
+    if not await User.get(str(message.author.id)):
         return
 
     cat_id = message.channel.category.id if message.channel.category else None
@@ -336,44 +333,3 @@ async def on_raw_bulk_message_delete(messages: RawBulkMessageDeleteEvent) -> Non
     for message_id in messages.message_ids:
         if message := await Message.get(str(message_id)):
             await message.update(is_deleted=True).apply()
-
-
-@bot.command()
-async def opt_in(ctx: Context) -> None:
-    """Opt-in to the server analytics system."""
-    user = await User.get(str(ctx.author.id))
-
-    if not user:
-        return await ctx.send(
-            f"Sorry {ctx.author.mention}, I don't have a record for you yet"
-            " which probably means you joined recently enough to have missed"
-            " the user synchronisation. Please check back soon or contact"
-            " `joe#6000` for additional help."
-        )
-
-    await user.update(opt_out=False).apply()
-
-    await ctx.send("Your preferences have been updated.")
-
-
-@bot.command()
-async def opt_out(ctx: Context) -> None:
-    """
-    Opt-out to the server analytics system.
-
-    This only disables message reporting, user information is kept
-    in accordance with our privacy policy.
-    """
-    user = await User.get(str(ctx.author.id))
-
-    if not user:
-        return await ctx.send(
-            f"Sorry {ctx.author.mention}, I don't have a record for you yet"
-            " which probably means you joined recently enough to have missed"
-            " the user synchronisation. Please check back soon or contact"
-            " `joe#6000` for additional help."
-        )
-
-    await user.update(opt_out=True).apply()
-
-    await ctx.send("Your preferences have been updated.")
