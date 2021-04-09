@@ -11,7 +11,7 @@ from discord import (
     VoiceChannel
 )
 from discord.abc import Messageable
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import Bot
 
 from metricity import __version__
 from metricity.config import BotConfig
