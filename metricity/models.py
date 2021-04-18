@@ -43,7 +43,6 @@ class User(db.Model):
     joined_at = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     is_staff = db.Column(db.Boolean, nullable=False)
-    opt_out = db.Column(db.Boolean, default=False)
     bot = db.Column(db.Boolean, default=False)
     in_guild = db.Column(db.Boolean, default=True)
     public_flags = db.Column(db.JSON, default={})
