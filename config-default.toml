@@ -11,9 +11,6 @@ log_level = "INFO"
 discord_log_level = "INFO"
 
 [bot]
-# The prefixes Metricity respond to.
-command_prefix = ["m!"]
-
 # The token Metricity will use to authenticate with Discord.
 token = { env = "BOT_TOKEN" }
 
@@ -39,9 +36,6 @@ staff_categories = [
 ignore_categories = [
     714494672835444826
 ]
-
-# Respond to opt-in/opt-out commands in the following channel
-bot_commands_channel = 267659945086812160
 
 [database]
 # Postgres!
