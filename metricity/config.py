@@ -2,7 +2,7 @@
 import logging
 from os import environ
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import toml
 from deepmerge import Merger
@@ -109,7 +109,6 @@ class BotConfig(metaclass=ConfigSection):
 
     section = "bot"
 
-    command_prefix: Union[List[str], str]
     token: str
 
     guild_id: int
@@ -117,8 +116,6 @@ class BotConfig(metaclass=ConfigSection):
 
     staff_categories: List[int]
     ignore_categories: List[int]
-
-    bot_commands_channel: int
 
 
 class DatabaseConfig(metaclass=ConfigSection):

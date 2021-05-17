@@ -37,7 +37,8 @@ intents = Intents(
 
 
 bot = Bot(
-    command_prefix=BotConfig.command_prefix,
+    command_prefix="",
+    help_command=None,
     intents=intents,
     max_messages=None,
     activity=Game(f"Metricity {__version__}")
@@ -288,9 +289,6 @@ async def on_member_update(before: Member, member: Member) -> None:
 async def on_message(message: DiscordMessage) -> None:
     """Add a message to the table when one is sent providing the author has accepted."""
     await db_ready.wait()
-
-    if message.channel.id == BotConfig.bot_commands_channel:
-        await bot.process_commands(message)
 
     if not message.guild:
         return
