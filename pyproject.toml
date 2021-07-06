@@ -6,7 +6,7 @@ authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "~3.8 || ~3.9"
 "discord.py" = "^1.7"
 deepmerge = "^0.1.0"
 toml = "^0.10.1"
