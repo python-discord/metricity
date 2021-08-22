@@ -78,10 +78,9 @@ async def sync_channels(guild: Guild) -> None:
                     name=channel.name,
                     category_id=str(channel.category.id) if channel.category else None,
                     is_staff=(
-                        True
-                        if channel.category.id in BotConfig.staff_categories
-                        else False
-                    )
+                        channel.category
+                        and channel.category.id in BotConfig.staff_categories
+                    ),
                 ).apply()
             else:
                 await Channel.create(
@@ -89,10 +88,9 @@ async def sync_channels(guild: Guild) -> None:
                     name=channel.name,
                     category_id=str(channel.category.id) if channel.category else None,
                     is_staff=(
-                        True
-                        if channel.category.id in BotConfig.staff_categories
-                        else False
-                    )
+                        channel.category
+                        and channel.category.id in BotConfig.staff_categories
+                    ),
                 )
 
     channel_sync_in_progress.set()
