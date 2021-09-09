@@ -1,0 +1,43 @@
+version: "3.8"
+
+x-logging: &logging
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "10m"
+
+x-restart-policy: &restart_policy
+  restart: "no"
+
+services:
+  postgres:
+    << : *logging
+    << : *restart_policy
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: pysite
+      POSTGRES_PASSWORD: pysite
+      POSTGRES_USER: pysite
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pysite"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+
+  metricity:
+    << : *logging
+    << : *restart_policy
+    depends_on: 
+      postgres:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./logs:/metricity/logs
+      - .:/metricity:ro
+    env_file:
+      - .env
+    environment:
+      DATABASE_URI: postgres://pysite:pysite@postgres
