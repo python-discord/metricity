@@ -1,6 +1,9 @@
 set -e
+
 python create_metricity_db.py
 alembic upgrade head
-if [ -z "$skip_metricity" ]; then
+
+shopt -s nocasematch
+if [ "$skip_metricity" != "true" ]; then
     poetry run start
 fi
