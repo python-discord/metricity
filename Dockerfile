@@ -16,4 +16,4 @@ RUN poetry config virtualenvs.create false && poetry install
 
 COPY . /metricity
 
-CMD ["sh", "-c", "alembic upgrade head && poetry run start"]
+CMD ["bash", "entry_point.sh"]
