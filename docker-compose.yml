@@ -40,4 +40,4 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URI: postgres://pysite:pysite@postgres
+      DATABASE_URI: postgres://pysite:pysite@postgres/metricity
