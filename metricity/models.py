@@ -33,6 +33,25 @@ class Channel(db.Model):
     is_staff = db.Column(db.Boolean, nullable=False)
 
 
+class Thread(db.Model):
+    """Database model representing a Thread channel."""
+
+    __tablename__ = "threads"
+
+    id = db.Column(db.String, primary_key=True)
+    parent_channel_id = db.Column(
+        db.String,
+        db.ForeignKey("channels.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
+    name = db.Column(db.String, nullable=False)
+    archived = db.Column(db.Boolean, default=False, nullable=False)
+    auto_archive_duration = db.Column(db.Integer, nullable=False)
+    locked = db.Column(db.Boolean, default=False, nullable=False)
+    type = db.Column(db.String, nullable=False, index=True)
+
+
 class User(db.Model):
     """Database model representing a Discord user."""
 
@@ -82,6 +101,11 @@ class Message(db.Model):
     channel_id = db.Column(
         db.String,
         db.ForeignKey("channels.id", ondelete="CASCADE"),
+        index=True
+    )
+    thread_id = db.Column(
+        db.String,
+        db.ForeignKey("threads.id", ondelete="CASCADE"),
         index=True
     )
     author_id = db.Column(

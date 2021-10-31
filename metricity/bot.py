@@ -314,12 +314,21 @@ async def on_message(message: DiscordMessage) -> None:
     if cat_id in BotConfig.ignore_categories:
         return
 
-    await Message.create(
-        id=str(message.id),
-        channel_id=str(message.channel.id),
-        author_id=str(message.author.id),
-        created_at=message.created_at
-    )
+    args = {
+        "id": str(message.id),
+        "channel_id": str(message.channel.id),
+        "author_id": str(message.author.id),
+        "created_at": message.created_at
+    }
+
+    if isinstance(message.channel, ThreadChannel):
+        thread = message.channel
+        args["channel_id"] = str(thread.parent_id)
+        args["thread_id"] = str(thread.id)
+        if not await Thread.get(str(thread.id)):
+            await insert_thread(thread)
+
+    await Message.create(**args)
 
 
 @bot.event
