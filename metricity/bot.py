@@ -157,7 +157,8 @@ async def on_guild_available(guild: Guild) -> None:
         users.append({
             "id": str(user.id),
             "name": user.name,
-            "avatar_hash": user.avatar,
+            "avatar_hash": getattr(user.avatar, "key", None),
+            "guild_avatar_hash": getattr(user.guild_avatar, "key", None),
             "joined_at": user.joined_at,
             "created_at": user.created_at,
             "is_staff": BotConfig.staff_role_id in [role.id for role in user.roles],
@@ -193,7 +194,8 @@ async def on_member_join(member: Member) -> None:
         await db_user.update(
             id=str(member.id),
             name=member.name,
-            avatar_hash=member.avatar,
+            avatar_hash=getattr(member.avatar, "key", None),
+            guild_avatar_hash=getattr(member.guild_avatar, "key", None),
             joined_at=member.joined_at,
             created_at=member.created_at,
             is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
@@ -206,7 +208,8 @@ async def on_member_join(member: Member) -> None:
             await User.create(
                 id=str(member.id),
                 name=member.name,
-                avatar_hash=member.avatar,
+                avatar_hash=getattr(member.avatar, "key", None),
+                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
@@ -250,7 +253,8 @@ async def on_member_update(before: Member, member: Member) -> None:
     if db_user := await User.get(str(member.id)):
         if (
             db_user.name != member.name or
-            db_user.avatar_hash != member.avatar or
+            db_user.avatar_hash != getattr(member.avatar, "key", None) or
+            db_user.guild_avatar_hash != getattr(member.guild_avatar, "key", None) or
             BotConfig.staff_role_id in
             [role.id for role in member.roles] != db_user.is_staff
             or db_user.pending is not member.pending
@@ -258,7 +262,8 @@ async def on_member_update(before: Member, member: Member) -> None:
             await db_user.update(
                 id=str(member.id),
                 name=member.name,
-                avatar_hash=member.avatar,
+                avatar_hash=getattr(member.avatar, "key", None),
+                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
@@ -271,7 +276,8 @@ async def on_member_update(before: Member, member: Member) -> None:
             await User.create(
                 id=str(member.id),
                 name=member.name,
-                avatar_hash=member.avatar,
+                avatar_hash=getattr(member.avatar, "key", None),
+                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,

@@ -40,6 +40,7 @@ class User(db.Model):
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     avatar_hash = db.Column(db.String, nullable=True)
+    guild_avatar_hash = db.Column(db.String, nullable=True)
     joined_at = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     is_staff = db.Column(db.Boolean, nullable=False)
@@ -56,6 +57,7 @@ class User(db.Model):
         update_cols = [
             "name",
             "avatar_hash",
+            "guild_avatar_hash",
             "joined_at",
             "is_staff",
             "bot",
@@ -65,8 +67,8 @@ class User(db.Model):
         ]
 
         return qs.on_conflict_do_update(
-                index_elements=[cls.id],
-                set_={k: getattr(qs.excluded, k) for k in update_cols}
+            index_elements=[cls.id],
+            set_={k: getattr(qs.excluded, k) for k in update_cols}
         ).returning(cls.__table__).gino.all()
 
 
