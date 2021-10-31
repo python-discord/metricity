@@ -6,17 +6,25 @@ from typing import Any, Generator, List
 
 from asyncpg.exceptions import UniqueViolationError
 from discord import (
-    CategoryChannel, Game, Guild, Intents,
-    Member, Message as DiscordMessage, RawBulkMessageDeleteEvent, RawMessageDeleteEvent,
-    VoiceChannel
+    CategoryChannel,
+    Game,
+    Guild,
+    Intents,
+    Member,
+    Message as DiscordMessage,
+    MessageType,
+    RawBulkMessageDeleteEvent,
+    RawMessageDeleteEvent,
+    Thread as ThreadChannel,
+    VoiceChannel,
 )
 from discord.abc import Messageable
 from discord.ext.commands import Bot
 
 from metricity import __version__
 from metricity.config import BotConfig
-from metricity.database import connect
-from metricity.models import Category, Channel, Message, User
+from metricity.database import connect, db
+from metricity.models import Category, Channel, Message, Thread, User
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +55,19 @@ bot = Bot(
 sync_process_complete = asyncio.Event()
 channel_sync_in_progress = asyncio.Event()
 db_ready = asyncio.Event()
+
+
+async def insert_thread(thread: ThreadChannel) -> None:
+    """Insert the given thread to the database."""
+    await Thread.create(
+        id=str(thread.id),
+        parent_channel_id=str(thread.parent_id),
+        name=thread.name,
+        archived=thread.archived,
+        auto_archive_duration=thread.auto_archive_duration,
+        locked=thread.locked,
+        type=thread.type.name,
+    )
 
 
 async def sync_channels(guild: Guild) -> None:
@@ -92,6 +113,30 @@ async def sync_channels(guild: Guild) -> None:
                         and channel.category.id in BotConfig.staff_categories
                     ),
                 )
+
+    log.info("Channel synchronisation process complete, synchronising threads")
+
+    active_thread_ids = []
+    for thread in guild.threads:
+        active_thread_ids.append(thread.id)
+        if thread.parent and thread.parent.category:
+            if thread.parent.category.id in BotConfig.ignore_categories:
+                continue
+
+        if db_thread := await Thread.get(str(thread.id)):
+            await db_thread.update(
+                name=thread.name,
+                archived=thread.archived,
+                auto_archive_duration=thread.auto_archive_duration,
+                locked=thread.locked,
+                type=thread.type.name,
+            ).apply()
+        else:
+            await insert_thread(thread)
+
+    async with db.transaction():
+        async for db_thread in Thread.query.gino.iterate():
+            await db_thread.update(archived=db_thread.id in active_thread_ids).apply()
 
     channel_sync_in_progress.set()
 
