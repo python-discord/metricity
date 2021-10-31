@@ -181,6 +181,17 @@ async def on_guild_channel_update(_before: Messageable, channel: Messageable) ->
 
 
 @bot.event
+async def on_thread_update(thread: Messageable) -> None:
+    """Sync the channels when one is updated."""
+    await db_ready.wait()
+
+    if thread.guild.id != BotConfig.guild_id:
+        return
+
+    await sync_channels(thread.guild)
+
+
+@bot.event
 async def on_guild_available(guild: Guild) -> None:
     """Synchronize the user table with the Discord users."""
     await db_ready.wait()
