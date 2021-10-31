@@ -1,11 +1,12 @@
 """Database models used by Metricity for statistic collection."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from sqlalchemy.dialects.postgresql import insert
 
 from metricity.database import db
+from metricity.utils import TZDateTime
 
 
 class Category(db.Model):
@@ -41,8 +42,8 @@ class User(db.Model):
     name = db.Column(db.String, nullable=False)
     avatar_hash = db.Column(db.String, nullable=True)
     guild_avatar_hash = db.Column(db.String, nullable=True)
-    joined_at = db.Column(db.DateTime, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
+    joined_at = db.Column(TZDateTime(), nullable=False)
+    created_at = db.Column(TZDateTime(), nullable=False)
     is_staff = db.Column(db.Boolean, nullable=False)
     bot = db.Column(db.Boolean, default=False)
     in_guild = db.Column(db.Boolean, default=True)
@@ -88,5 +89,5 @@ class Message(db.Model):
         db.ForeignKey("users.id", ondelete="CASCADE"),
         index=True
     )
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
     is_deleted = db.Column(db.Boolean, default=False)
