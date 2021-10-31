@@ -359,6 +359,9 @@ async def on_message(message: DiscordMessage) -> None:
     if message.guild.id != BotConfig.guild_id:
         return
 
+    if message.type == MessageType.thread_created:
+        return
+
     await sync_process_complete.wait()
     await channel_sync_in_progress.wait()
 
