@@ -118,7 +118,7 @@ async def sync_channels(guild: Guild) -> None:
 
     active_thread_ids = []
     for thread in guild.threads:
-        active_thread_ids.append(thread.id)
+        active_thread_ids.append(str(thread.id))
         if thread.parent and thread.parent.category:
             if thread.parent.category.id in BotConfig.ignore_categories:
                 continue
@@ -136,7 +136,7 @@ async def sync_channels(guild: Guild) -> None:
 
     async with db.transaction():
         async for db_thread in Thread.query.gino.iterate():
-            await db_thread.update(archived=db_thread.id in active_thread_ids).apply()
+            await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
 
     channel_sync_in_progress.set()
 
