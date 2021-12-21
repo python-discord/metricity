@@ -6,17 +6,25 @@ from typing import Any, Generator, List
 
 from asyncpg.exceptions import UniqueViolationError
 from discord import (
-    CategoryChannel, Game, Guild, Intents,
-    Member, Message as DiscordMessage, RawBulkMessageDeleteEvent, RawMessageDeleteEvent,
-    VoiceChannel
+    CategoryChannel,
+    Game,
+    Guild,
+    Intents,
+    Member,
+    Message as DiscordMessage,
+    MessageType,
+    RawBulkMessageDeleteEvent,
+    RawMessageDeleteEvent,
+    Thread as ThreadChannel,
+    VoiceChannel,
 )
 from discord.abc import Messageable
 from discord.ext.commands import Bot
 
 from metricity import __version__
 from metricity.config import BotConfig
-from metricity.database import connect
-from metricity.models import Category, Channel, Message, User
+from metricity.database import connect, db
+from metricity.models import Category, Channel, Message, Thread, User
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +55,19 @@ bot = Bot(
 sync_process_complete = asyncio.Event()
 channel_sync_in_progress = asyncio.Event()
 db_ready = asyncio.Event()
+
+
+async def insert_thread(thread: ThreadChannel) -> None:
+    """Insert the given thread to the database."""
+    await Thread.create(
+        id=str(thread.id),
+        parent_channel_id=str(thread.parent_id),
+        name=thread.name,
+        archived=thread.archived,
+        auto_archive_duration=thread.auto_archive_duration,
+        locked=thread.locked,
+        type=thread.type.name,
+    )
 
 
 async def sync_channels(guild: Guild) -> None:
@@ -93,6 +114,30 @@ async def sync_channels(guild: Guild) -> None:
                     ),
                 )
 
+    log.info("Channel synchronisation process complete, synchronising threads")
+
+    active_thread_ids = []
+    for thread in guild.threads:
+        active_thread_ids.append(str(thread.id))
+        if thread.parent and thread.parent.category:
+            if thread.parent.category.id in BotConfig.ignore_categories:
+                continue
+
+        if db_thread := await Thread.get(str(thread.id)):
+            await db_thread.update(
+                name=thread.name,
+                archived=thread.archived,
+                auto_archive_duration=thread.auto_archive_duration,
+                locked=thread.locked,
+                type=thread.type.name,
+            ).apply()
+        else:
+            await insert_thread(thread)
+
+    async with db.transaction():
+        async for db_thread in Thread.query.gino.iterate():
+            await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
+
     channel_sync_in_progress.set()
 
 
@@ -136,6 +181,17 @@ async def on_guild_channel_update(_before: Messageable, channel: Messageable) ->
 
 
 @bot.event
+async def on_thread_update(thread: Messageable) -> None:
+    """Sync the channels when one is updated."""
+    await db_ready.wait()
+
+    if thread.guild.id != BotConfig.guild_id:
+        return
+
+    await sync_channels(thread.guild)
+
+
+@bot.event
 async def on_guild_available(guild: Guild) -> None:
     """Synchronize the user table with the Discord users."""
     await db_ready.wait()
@@ -157,7 +213,8 @@ async def on_guild_available(guild: Guild) -> None:
         users.append({
             "id": str(user.id),
             "name": user.name,
-            "avatar_hash": user.avatar,
+            "avatar_hash": getattr(user.avatar, "key", None),
+            "guild_avatar_hash": getattr(user.guild_avatar, "key", None),
             "joined_at": user.joined_at,
             "created_at": user.created_at,
             "is_staff": BotConfig.staff_role_id in [role.id for role in user.roles],
@@ -193,7 +250,8 @@ async def on_member_join(member: Member) -> None:
         await db_user.update(
             id=str(member.id),
             name=member.name,
-            avatar_hash=member.avatar,
+            avatar_hash=getattr(member.avatar, "key", None),
+            guild_avatar_hash=getattr(member.guild_avatar, "key", None),
             joined_at=member.joined_at,
             created_at=member.created_at,
             is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
@@ -206,7 +264,8 @@ async def on_member_join(member: Member) -> None:
             await User.create(
                 id=str(member.id),
                 name=member.name,
-                avatar_hash=member.avatar,
+                avatar_hash=getattr(member.avatar, "key", None),
+                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
@@ -250,7 +309,8 @@ async def on_member_update(before: Member, member: Member) -> None:
     if db_user := await User.get(str(member.id)):
         if (
             db_user.name != member.name or
-            db_user.avatar_hash != member.avatar or
+            db_user.avatar_hash != getattr(member.avatar, "key", None) or
+            db_user.guild_avatar_hash != getattr(member.guild_avatar, "key", None) or
             BotConfig.staff_role_id in
             [role.id for role in member.roles] != db_user.is_staff
             or db_user.pending is not member.pending
@@ -258,7 +318,8 @@ async def on_member_update(before: Member, member: Member) -> None:
             await db_user.update(
                 id=str(member.id),
                 name=member.name,
-                avatar_hash=member.avatar,
+                avatar_hash=getattr(member.avatar, "key", None),
+                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
@@ -271,7 +332,8 @@ async def on_member_update(before: Member, member: Member) -> None:
             await User.create(
                 id=str(member.id),
                 name=member.name,
-                avatar_hash=member.avatar,
+                avatar_hash=getattr(member.avatar, "key", None),
+                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
                 joined_at=member.joined_at,
                 created_at=member.created_at,
                 is_staff=BotConfig.staff_role_id in roles,
@@ -297,6 +359,9 @@ async def on_message(message: DiscordMessage) -> None:
     if message.guild.id != BotConfig.guild_id:
         return
 
+    if message.type == MessageType.thread_created:
+        return
+
     await sync_process_complete.wait()
     await channel_sync_in_progress.wait()
 
@@ -308,12 +373,21 @@ async def on_message(message: DiscordMessage) -> None:
     if cat_id in BotConfig.ignore_categories:
         return
 
-    await Message.create(
-        id=str(message.id),
-        channel_id=str(message.channel.id),
-        author_id=str(message.author.id),
-        created_at=message.created_at
-    )
+    args = {
+        "id": str(message.id),
+        "channel_id": str(message.channel.id),
+        "author_id": str(message.author.id),
+        "created_at": message.created_at
+    }
+
+    if isinstance(message.channel, ThreadChannel):
+        thread = message.channel
+        args["channel_id"] = str(thread.parent_id)
+        args["thread_id"] = str(thread.id)
+        if not await Thread.get(str(thread.id)):
+            await insert_thread(thread)
+
+    await Message.create(**args)
 
 
 @bot.event

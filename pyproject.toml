@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "metricity"
-version = "1.2.0"
+version = "1.3.0"
 description = "Advanced metric collection for the Python Discord server"
 authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "~3.8 || ~3.9"
-"discord.py" = "^1.7"
+"discord.py" = {url = "https://github.com/Rapptz/discord.py/archive/master.zip"}
 deepmerge = "^0.1.0"
 toml = "^0.10.1"
 coloredlogs = "^14.0"

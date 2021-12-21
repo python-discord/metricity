@@ -24,6 +24,8 @@ services:
       interval: 2s
       timeout: 1s
       retries: 5
+    ports:
+      - 5432:5432
 
   metricity:
     << : *logging

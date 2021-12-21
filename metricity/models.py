@@ -1,11 +1,12 @@
 """Database models used by Metricity for statistic collection."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from sqlalchemy.dialects.postgresql import insert
 
 from metricity.database import db
+from metricity.utils import TZDateTime
 
 
 class Category(db.Model):
@@ -32,6 +33,25 @@ class Channel(db.Model):
     is_staff = db.Column(db.Boolean, nullable=False)
 
 
+class Thread(db.Model):
+    """Database model representing a Thread channel."""
+
+    __tablename__ = "threads"
+
+    id = db.Column(db.String, primary_key=True)
+    parent_channel_id = db.Column(
+        db.String,
+        db.ForeignKey("channels.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
+    name = db.Column(db.String, nullable=False)
+    archived = db.Column(db.Boolean, default=False, nullable=False)
+    auto_archive_duration = db.Column(db.Integer, nullable=False)
+    locked = db.Column(db.Boolean, default=False, nullable=False)
+    type = db.Column(db.String, nullable=False, index=True)
+
+
 class User(db.Model):
     """Database model representing a Discord user."""
 
@@ -40,8 +60,9 @@ class User(db.Model):
     id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     avatar_hash = db.Column(db.String, nullable=True)
-    joined_at = db.Column(db.DateTime, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
+    guild_avatar_hash = db.Column(db.String, nullable=True)
+    joined_at = db.Column(TZDateTime(), nullable=False)
+    created_at = db.Column(TZDateTime(), nullable=False)
     is_staff = db.Column(db.Boolean, nullable=False)
     bot = db.Column(db.Boolean, default=False)
     in_guild = db.Column(db.Boolean, default=True)
@@ -56,6 +77,7 @@ class User(db.Model):
         update_cols = [
             "name",
             "avatar_hash",
+            "guild_avatar_hash",
             "joined_at",
             "is_staff",
             "bot",
@@ -65,8 +87,8 @@ class User(db.Model):
         ]
 
         return qs.on_conflict_do_update(
-                index_elements=[cls.id],
-                set_={k: getattr(qs.excluded, k) for k in update_cols}
+            index_elements=[cls.id],
+            set_={k: getattr(qs.excluded, k) for k in update_cols}
         ).returning(cls.__table__).gino.all()
 
 
@@ -81,10 +103,15 @@ class Message(db.Model):
         db.ForeignKey("channels.id", ondelete="CASCADE"),
         index=True
     )
+    thread_id = db.Column(
+        db.String,
+        db.ForeignKey("threads.id", ondelete="CASCADE"),
+        index=True
+    )
     author_id = db.Column(
         db.String,
         db.ForeignKey("users.id", ondelete="CASCADE"),
         index=True
     )
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
     is_deleted = db.Column(db.Boolean, default=False)
