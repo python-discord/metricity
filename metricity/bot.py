@@ -181,7 +181,7 @@ async def on_guild_channel_update(_before: Messageable, channel: Messageable) ->
 
 
 @bot.event
-async def on_thread_update(thread: Messageable) -> None:
+async def on_thread_update(_before: Messageable, thread: Messageable) -> None:
     """Sync the channels when one is updated."""
     await db_ready.wait()
 
