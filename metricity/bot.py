@@ -116,9 +116,7 @@ async def sync_channels(guild: Guild) -> None:
 
     log.info("Channel synchronisation process complete, synchronising threads")
 
-    active_thread_ids = []
     for thread in guild.threads:
-        active_thread_ids.append(str(thread.id))
         if thread.parent and thread.parent.category:
             if thread.parent.category.id in BotConfig.ignore_categories:
                 continue
@@ -133,12 +131,15 @@ async def sync_channels(guild: Guild) -> None:
             ).apply()
         else:
             await insert_thread(thread)
-
-    async with db.transaction():
-        async for db_thread in Thread.query.gino.iterate():
-            await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
-
     channel_sync_in_progress.set()
+
+
+async def sync_thread_archive_state(guild: Guild) -> None:
+    """Sync the archive state of all threads in the database with the state in guild."""
+    active_thread_ids = [str(thread.id) for thread in guild.threads]
+    async with db.transaction() as tx:
+        async for db_thread in tx.connection.iterate(Thread.query):
+            await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
 
 
 def gen_chunks(
