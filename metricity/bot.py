@@ -185,6 +185,23 @@ async def on_guild_channel_update(_before: Messageable, channel: Messageable) ->
 
 
 @bot.event
+async def on_thread_join(thread: ThreadChannel) -> None:
+    """
+    Sync channels when thread join is triggered.
+
+    Unlike what the name suggested, this is also triggered when:
+       - A thread is created.
+       - An un-cached thread is un-archived.
+    """
+    await db_ready.wait()
+
+    if thread.guild.id != BotConfig.guild_id:
+        return
+
+    await sync_channels(thread.guild)
+
+
+@bot.event
 async def on_thread_update(_before: Messageable, thread: Messageable) -> None:
     """Sync the channels when one is updated."""
     await db_ready.wait()
@@ -206,6 +223,9 @@ async def on_guild_available(guild: Guild) -> None:
         return log.info("Guild was not the configured guild, discarding event")
 
     await sync_channels(guild)
+
+    log.info("Beginning thread archive state synchronisation process")
+    await sync_thread_archive_state(guild)
 
     log.info("Beginning user synchronisation process")
 
