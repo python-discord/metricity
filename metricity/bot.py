@@ -120,6 +120,9 @@ async def sync_channels(guild: Guild) -> None:
         if thread.parent and thread.parent.category:
             if thread.parent.category.id in BotConfig.ignore_categories:
                 continue
+        else:
+            # This is a forum channel, not currently supported by Discord.py. Ignore it.
+            continue
 
         if db_thread := await Thread.get(str(thread.id)):
             await db_thread.update(
@@ -382,11 +385,12 @@ async def on_message(message: DiscordMessage) -> None:
     }
 
     if isinstance(message.channel, ThreadChannel):
+        if not message.channel.parent:
+            # This is a forum channel, not currently supported by Discord.py. Ignore it.
+            return
         thread = message.channel
         args["channel_id"] = str(thread.parent_id)
         args["thread_id"] = str(thread.id)
-        if not await Thread.get(str(thread.id)):
-            await insert_thread(thread)
 
     await Message.create(**args)
 
