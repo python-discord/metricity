@@ -116,12 +116,13 @@ async def sync_channels(guild: Guild) -> None:
 
     log.info("Channel synchronisation process complete, synchronising threads")
 
-    active_thread_ids = []
     for thread in guild.threads:
-        active_thread_ids.append(str(thread.id))
         if thread.parent and thread.parent.category:
             if thread.parent.category.id in BotConfig.ignore_categories:
                 continue
+        else:
+            # This is a forum channel, not currently supported by Discord.py. Ignore it.
+            continue
 
         if db_thread := await Thread.get(str(thread.id)):
             await db_thread.update(
@@ -133,12 +134,15 @@ async def sync_channels(guild: Guild) -> None:
             ).apply()
         else:
             await insert_thread(thread)
-
-    async with db.transaction():
-        async for db_thread in Thread.query.gino.iterate():
-            await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
-
     channel_sync_in_progress.set()
+
+
+async def sync_thread_archive_state(guild: Guild) -> None:
+    """Sync the archive state of all threads in the database with the state in guild."""
+    active_thread_ids = [str(thread.id) for thread in guild.threads]
+    async with db.transaction() as tx:
+        async for db_thread in tx.connection.iterate(Thread.query):
+            await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
 
 
 def gen_chunks(
@@ -181,6 +185,23 @@ async def on_guild_channel_update(_before: Messageable, channel: Messageable) ->
 
 
 @bot.event
+async def on_thread_join(thread: ThreadChannel) -> None:
+    """
+    Sync channels when thread join is triggered.
+
+    Unlike what the name suggested, this is also triggered when:
+       - A thread is created.
+       - An un-cached thread is un-archived.
+    """
+    await db_ready.wait()
+
+    if thread.guild.id != BotConfig.guild_id:
+        return
+
+    await sync_channels(thread.guild)
+
+
+@bot.event
 async def on_thread_update(_before: Messageable, thread: Messageable) -> None:
     """Sync the channels when one is updated."""
     await db_ready.wait()
@@ -202,6 +223,9 @@ async def on_guild_available(guild: Guild) -> None:
         return log.info("Guild was not the configured guild, discarding event")
 
     await sync_channels(guild)
+
+    log.info("Beginning thread archive state synchronisation process")
+    await sync_thread_archive_state(guild)
 
     log.info("Beginning user synchronisation process")
 
@@ -381,11 +405,12 @@ async def on_message(message: DiscordMessage) -> None:
     }
 
     if isinstance(message.channel, ThreadChannel):
+        if not message.channel.parent:
+            # This is a forum channel, not currently supported by Discord.py. Ignore it.
+            return
         thread = message.channel
         args["channel_id"] = str(thread.parent_id)
         args["thread_id"] = str(thread.id)
-        if not await Thread.get(str(thread.id)):
-            await insert_thread(thread)
 
     await Message.create(**args)
 
