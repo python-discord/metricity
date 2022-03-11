@@ -34,7 +34,8 @@ staff_categories = [
 
 # Don't report messages for the following categories
 ignore_categories = [
-    714494672835444826
+    714494672835444826,
+    890331800025563216
 ]
 
 [database]
