@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "~3.8 || ~3.9"
-"discord.py" = {url = "https://github.com/Rapptz/discord.py/archive/master.zip"}
+"discord.py" = {url = "https://github.com/Rapptz/discord.py/archive/45d498c1b76deaf3b394d17ccf56112fa691d160.zip"}
 deepmerge = "^0.1.0"
 toml = "^0.10.1"
 coloredlogs = "^14.0"
