@@ -94,24 +94,24 @@ async def sync_channels(guild: Guild) -> None:
             not isinstance(channel, CategoryChannel) and
             not isinstance(channel, VoiceChannel)
         ):
+            category_id = str(channel.category.id) if channel.category else None
+            # Cast to bool so is_staff is False if channel.category is None
+            is_staff = bool(
+                channel.category
+                and channel.category.id in BotConfig.staff_categories
+            )
             if db_chan := await Channel.get(str(channel.id)):
                 await db_chan.update(
                     name=channel.name,
-                    category_id=str(channel.category.id) if channel.category else None,
-                    is_staff=(
-                        channel.category
-                        and channel.category.id in BotConfig.staff_categories
-                    ),
+                    category_id=category_id,
+                    is_staff=is_staff,
                 ).apply()
             else:
                 await Channel.create(
                     id=str(channel.id),
                     name=channel.name,
-                    category_id=str(channel.category.id) if channel.category else None,
-                    is_staff=(
-                        channel.category
-                        and channel.category.id in BotConfig.staff_categories
-                    ),
+                    category_id=category_id,
+                    is_staff=is_staff,
                 )
 
     log.info("Channel synchronisation process complete, synchronising threads")
