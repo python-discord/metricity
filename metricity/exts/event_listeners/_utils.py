@@ -21,10 +21,6 @@ async def sync_message(message: discord.Message, from_thread: bool) -> None:
     if await models.Message.get(str(message.id)):
         return
 
-    if from_thread and not message.channel.parent:
-        # This is a forum channel, not currently supported by Discord.py. Ignore it.
-        return
-
     args = {
         "id": str(message.id),
         "channel_id": str(message.channel.id),
@@ -36,7 +32,5 @@ async def sync_message(message: discord.Message, from_thread: bool) -> None:
         thread = message.channel
         args["channel_id"] = str(thread.parent_id)
         args["thread_id"] = str(thread.id)
-        if not await models.Thread.get(str(thread.id)):
-            await insert_thread(thread)
 
     await models.Message.create(**args)
