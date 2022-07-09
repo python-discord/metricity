@@ -5,8 +5,7 @@ from typing import Any, Dict, List
 
 from sqlalchemy.dialects.postgresql import insert
 
-from metricity.database import db
-from metricity.utils import TZDateTime
+from metricity.database import TZDateTime, db
 
 
 class Category(db.Model):
