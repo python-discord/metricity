@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: "Lint code"
@@ -18,14 +22,12 @@ jobs:
     - name: Checkout branch
       uses: actions/checkout@v2
 
-    - name: Setup Python
-      uses: actions/setup-python@v2
-
-    - name: Install Poetry and project dependencies
-      uses: knowsuchagency/poetry-install@v2
-
-    - name: Setup flake8 annotations
-      uses: rbialon/flake8-annotations@v1
+    - name: Install Python Dependencies
+      uses: HassanAbouelela/actions/setup-python@setup-python_v1.1.0
+      with:
+        # Set dev=true to install flake8 extensions, which are dev dependencies
+        dev: true
+        python_version: 3.9
 
     - name: Lint code with Flake8
       run: poetry run flake8 . --count --show-source --statistics
