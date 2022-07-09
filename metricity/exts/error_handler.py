@@ -30,9 +30,9 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, e: commands.errors.CommandError) -> None:
         """Provide generic command error handling."""
-        if any(isinstance(e, suppressed_error) for suppressed_error in SUPPRESSED_ERRORS):
+        if isinstance(e, SUPPRESSED_ERRORS):
             log.debug(
-                f"Command {ctx.command} invoked by {ctx.message.author} with error "
+                f"Command {ctx.invoked_with} invoked by {ctx.message.author} with error "
                 f"{e.__class__.__name__}: {e}"
             )
 
