@@ -92,9 +92,8 @@ class GuildListeners(commands.Cog):
             if not isinstance(channel, discord.CategoryChannel):
                 category_id = str(channel.category.id) if channel.category else None
                 # Cast to bool so is_staff is False if channel.category is None
-                is_staff = bool(
-                    channel.category
-                    and channel.category.id in BotConfig.staff_categories
+                is_staff = channel.id in BotConfig.staff_channels or bool(
+                    channel.category and channel.category.id in BotConfig.staff_categories
                 )
                 if db_chan := await models.Channel.get(str(channel.id)):
                     await db_chan.update(

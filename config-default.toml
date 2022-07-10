@@ -36,6 +36,11 @@ staff_categories = [
     820711852652494868
 ]
 
+# Channels that should be flagged as staff only by channel ID
+staff_channels =[
+    412375055910043655
+]
+
 # Don't report messages for the following categories
 ignore_categories = [
     714494672835444826,

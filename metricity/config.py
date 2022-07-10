@@ -115,6 +115,7 @@ class BotConfig(metaclass=ConfigSection):
     staff_role_id: int
 
     staff_categories: list[int]
+    staff_channels: list[int]
     ignore_categories: list[int]
 
 
