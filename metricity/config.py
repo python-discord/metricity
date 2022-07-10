@@ -2,7 +2,7 @@
 import logging
 from os import environ
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import toml
 from deepmerge import Merger
@@ -17,7 +17,7 @@ class MetricityConfigurationError(Exception):
     """Exception signifying something has gone awry whilst parsing Metricity config."""
 
 
-def get_section(section: str) -> Dict[str, Any]:
+def get_section(section: str) -> dict[str, Any]:
     """
     Load the section config from config-default.toml and config.toml.
 
@@ -64,8 +64,8 @@ class ConfigSection(type):
     def __new__(
         cls: type,
         name: str,
-        bases: Tuple[type],
-        dictionary: Dict[str, Any]
+        bases: tuple[type],
+        dictionary: dict[str, Any]
     ) -> type:
         """Use the section attr in the subclass to fill in the values from the TOML."""
         config = get_section(dictionary["section"])
@@ -114,8 +114,8 @@ class BotConfig(metaclass=ConfigSection):
     guild_id: int
     staff_role_id: int
 
-    staff_categories: List[int]
-    ignore_categories: List[int]
+    staff_categories: list[int]
+    ignore_categories: list[int]
 
 
 class DatabaseConfig(metaclass=ConfigSection):
