@@ -1,7 +1,7 @@
 set -e
 
-python create_metricity_db.py
-alembic upgrade head
+poetry run python create_metricity_db.py
+poetry run alembic upgrade head
 
 if [ -e /tmp/bot/metricity-config.toml ]; then
     echo "Detected metricity running in bot context, copying config." 
