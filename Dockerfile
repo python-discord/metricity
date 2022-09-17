@@ -1,19 +1,12 @@
-FROM python:3.9.5-slim
+FROM --platform=linux/amd64 ghcr.io/chrislovering/python-poetry-base:3.9-slim
 
-ENV PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONHASHSEED=random \
-    PIP_NO_CACHE_DIR=off \
-    PIP_DISABLE_PIP_VERSION_CHECK=on \
-    PIP_DEFAULT_TIMEOUT=100
+ENV PYTHONHASHSEED=random
 
-RUN pip install poetry
-
+# Install Dependencies
 WORKDIR /metricity
-COPY poetry.lock pyproject.toml /metricity/
+COPY poetry.lock pyproject.toml ./
+RUN poetry install
 
-RUN poetry config virtualenvs.create false && poetry install
 
 COPY . /metricity
-
 CMD ["bash", "entry_point.sh"]
