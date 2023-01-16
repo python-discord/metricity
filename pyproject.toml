@@ -19,7 +19,7 @@ toml = "0.10.2"
 coloredlogs = "15.0.1"
 python-dotenv = "0.20.0"
 gino = "1.0.1"
-alembic = "1.8.0"
+alembic = "1.9.2"
 psycopg2-binary = "2.9.3"
 
 [tool.poetry.dev-dependencies]
