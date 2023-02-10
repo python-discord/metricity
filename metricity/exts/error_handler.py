@@ -1,8 +1,8 @@
 """Handles errors emitted from commands."""
 
 import discord
-from botcore.utils import logging
 from discord.ext import commands
+from pydis_core.utils import logging
 
 log = logging.get_logger(__name__)
 

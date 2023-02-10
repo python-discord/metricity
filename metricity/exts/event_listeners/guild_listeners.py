@@ -1,8 +1,8 @@
 """An ext to listen for guild (and guild channel) events and syncs them to the database."""
 
 import discord
-from botcore.utils import logging, scheduling
 from discord.ext import commands
+from pydis_core.utils import logging, scheduling
 
 from metricity import models
 from metricity.bot import Bot

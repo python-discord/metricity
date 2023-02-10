@@ -2,8 +2,8 @@
 
 import asyncio
 
-from botcore import BotBase
-from botcore.utils import logging, scheduling
+from pydis_core import BotBase
+from pydis_core.utils import logging, scheduling
 
 from metricity import exts
 from metricity.database import connect
@@ -12,7 +12,7 @@ log = logging.get_logger(__name__)
 
 
 class Bot(BotBase):
-    """A subclass of `botcore.BotBase` that implements bot-specific functions."""
+    """A subclass of `pydis_core.BotBase` that implements bot-specific functions."""
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
