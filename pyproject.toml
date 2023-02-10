@@ -1,32 +1,30 @@
 [tool.poetry]
 name = "metricity"
-version = "1.4.0"
+version = "2.0.0"
 description = "Advanced metric collection for the Python Discord server"
 authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "~3.9"
+python = "3.10.*"
 
-"discord.py" = {url = "https://github.com/Rapptz/discord.py/archive/0eb3d26343969a25ffc43ba72eca42538d2e7e7a.zip"}
 # See https://bot-core.pythondiscord.com/ for docs.
-bot-core = {url = "https://github.com/python-discord/bot-core/archive/refs/tags/v7.2.2.zip"}
+pydis-core = "9.4.1"
 
-aiodns = "3.0.0"
-aiohttp = "3.8.1"
-deepmerge = "1.0.1"
-toml = "0.10.2"
+alembic = "1.9.3"
+aiohttp = "3.8.3"
 coloredlogs = "15.0.1"
-python-dotenv = "0.20.0"
+deepmerge = "1.1.0"
 gino = "1.0.1"
-alembic = "1.8.0"
-psycopg2-binary = "2.9.3"
+python-dotenv = "0.21.1"
+psycopg2-binary = "2.9.5"
+toml = "0.10.2"
 
 [tool.poetry.dev-dependencies]
-flake8 = "4.0.1"
-flake8-annotations = "2.9.0"
-flake8-docstrings = "1.6.0"
-flake8-import-order = "0.18.1"
+flake8 = "6.0.0"
+flake8-annotations = "3.0.0"
+flake8-docstrings = "1.7.0"
+flake8-import-order = "0.18.2"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"

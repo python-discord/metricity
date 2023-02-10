@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 
 import coloredlogs
-from botcore.utils import apply_monkey_patches
+from pydis_core.utils import apply_monkey_patches
 
 from metricity.config import PythonConfig
 
