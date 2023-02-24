@@ -16,7 +16,7 @@ aiohttp = "3.8.3"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
 gino = "1.0.1"
-python-dotenv = "0.21.1"
+python-dotenv = "1.0.0"
 psycopg2-binary = "2.9.5"
 toml = "0.10.2"
 
