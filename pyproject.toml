@@ -12,7 +12,7 @@ python = "3.10.*"
 pydis-core = "9.4.1"
 
 alembic = "1.9.4"
-aiohttp = "3.8.3"
+aiohttp = "3.8.4"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
 gino = "1.0.1"
