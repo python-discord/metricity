@@ -14,7 +14,7 @@ from metricity.config import PythonConfig
 if TYPE_CHECKING:
     from metricity.bot import Bot
 
-__version__ = "1.4.0"
+__version__ = "2.0.1"
 
 # Set root log level
 logging.basicConfig(level=PythonConfig.log_level)
