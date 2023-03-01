@@ -9,7 +9,7 @@ license = "MIT"
 python = "3.10.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "9.4.1"
+pydis-core = "9.5.0"
 
 alembic = "1.9.4"
 aiohttp = "3.8.4"
