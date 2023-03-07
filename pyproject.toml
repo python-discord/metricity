@@ -11,7 +11,7 @@ python = "3.10.*"
 # See https://bot-core.pythondiscord.com/ for docs.
 pydis-core = "9.4.1"
 
-alembic = "1.9.4"
+alembic = "1.10.1"
 aiohttp = "3.8.4"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
