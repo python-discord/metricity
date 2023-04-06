@@ -365,14 +365,14 @@ files = [
 
 [[package]]
 name = "discord-py"
-version = "2.1.1"
+version = "2.2.2"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "discord.py-2.1.1-py3-none-any.whl", hash = "sha256:b99fbf4ad74f007c680f33f5174738858146c99a2bc4f6d0e08ddbf93bc12c4d"},
-    {file = "discord.py-2.1.1.tar.gz", hash = "sha256:8258b7af641c532e9e33e186c7b867d9ff5575fe63a460b17ed55bd4fe082200"},
+    {file = "discord.py-2.2.2-py3-none-any.whl", hash = "sha256:38fc52a784727b8e5e5749267089400035b187a009028eddfabeb182abcc6d52"},
+    {file = "discord.py-2.2.2.tar.gz", hash = "sha256:b9944056bcb5711b2d04088848fd004466cf117c15c84fa798bf55470f28275f"},
 ]
 
 [package.dependencies]
@@ -925,19 +925,19 @@ files = [
 
 [[package]]
 name = "pydis-core"
-version = "9.4.1"
+version = "9.5.1"
 description = "PyDis core provides core functionality and utility to the bots of the Python Discord community."
 category = "main"
 optional = false
 python-versions = ">=3.10.0,<3.12.0"
 files = [
-    {file = "pydis_core-9.4.1-py3-none-any.whl", hash = "sha256:29f1f69ae2bc5c9560ac3d43149ca9e7f13d567064555b76b79be5c8fa9ba6ba"},
-    {file = "pydis_core-9.4.1.tar.gz", hash = "sha256:b52c7ea052196aae72298ef59f59514376178e713cd133e0ca6fcb1d7312024c"},
+    {file = "pydis_core-9.5.1-py3-none-any.whl", hash = "sha256:50bbf1800fe228dd60ba6624615815f45139c105512ef701c556ee7dedaa91eb"},
+    {file = "pydis_core-9.5.1.tar.gz", hash = "sha256:83b89117def529c8b130f22c9f8cd46211df6329b039eedd5020098e656aa198"},
 ]
 
 [package.dependencies]
 aiodns = "3.0.0"
-"discord.py" = "2.1.1"
+"discord.py" = "2.2.2"
 statsd = "4.0.1"
 
 [package.extras]
@@ -1212,4 +1212,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.*"
-content-hash = "71f13f7cf7b2a875ead563a1f6ba5ffc9ea26d19edd38a4054a1ba14a48b9806"
+content-hash = "298ef058f7cdf09236f77a99fa03ee446f7d7af3c98c1643cbcf46545b0d9fb4"
