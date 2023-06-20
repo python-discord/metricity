@@ -33,10 +33,11 @@ def get_section(section: str) -> dict[str, Any]:
 
     # Load user configuration
     user_config = {}
+    user_config_location = Path(environ.get("CONFIG_LOCATION", "./config.toml"))
 
-    if Path("config.toml").exists():
-        with open("config.toml", "r") as default_config_file:
-            user_config = toml.load(default_config_file)
+    if user_config_location.exists():
+        with open(user_config_location, "r") as user_config_file:
+            user_config = toml.load(user_config_file)
 
     # Merge the configuration
     merger = Merger(
