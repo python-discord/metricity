@@ -1,5 +1,7 @@
 """An ext to listen for member events and syncs them to the database."""
 
+import contextlib
+
 import discord
 from asyncpg.exceptions import UniqueViolationError
 from discord.ext import commands
@@ -25,7 +27,7 @@ class MemberListeners(commands.Cog):
 
         if db_user := await User.get(str(member.id)):
             await db_user.update(
-                in_guild=False
+                in_guild=False,
             ).apply()
 
     @commands.Cog.listener()
@@ -47,10 +49,10 @@ class MemberListeners(commands.Cog):
                 is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
                 public_flags=dict(member.public_flags),
                 pending=member.pending,
-                in_guild=True
+                in_guild=True,
             ).apply()
         else:
-            try:
+            with contextlib.suppress(UniqueViolationError):
                 await User.create(
                     id=str(member.id),
                     name=member.name,
@@ -61,13 +63,11 @@ class MemberListeners(commands.Cog):
                     is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
                     public_flags=dict(member.public_flags),
                     pending=member.pending,
-                    in_guild=True
+                    in_guild=True,
                 )
-            except UniqueViolationError:
-                pass
 
     @commands.Cog.listener()
-    async def on_member_update(self, before: discord.Member, member: discord.Member) -> None:
+    async def on_member_update(self, _before: discord.Member, member: discord.Member) -> None:
         """When a member updates their profile, update the DB record."""
         await self.bot.sync_process_complete.wait()
 
@@ -78,7 +78,7 @@ class MemberListeners(commands.Cog):
         if not member.joined_at:
             return
 
-        roles = set([role.id for role in member.roles])
+        roles = {role.id for role in member.roles}
 
         if db_user := await User.get(str(member.id)):
             if (
@@ -99,10 +99,10 @@ class MemberListeners(commands.Cog):
                     is_staff=BotConfig.staff_role_id in roles,
                     public_flags=dict(member.public_flags),
                     in_guild=True,
-                    pending=member.pending
+                    pending=member.pending,
                 ).apply()
         else:
-            try:
+            with contextlib.suppress(UniqueViolationError):
                 await User.create(
                     id=str(member.id),
                     name=member.name,
@@ -113,10 +113,9 @@ class MemberListeners(commands.Cog):
                     is_staff=BotConfig.staff_role_id in roles,
                     public_flags=dict(member.public_flags),
                     in_guild=True,
-                    pending=member.pending
+                    pending=member.pending,
                 )
-            except UniqueViolationError:
-                pass
+
 
 
 async def setup(bot: Bot) -> None:

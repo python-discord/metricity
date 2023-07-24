@@ -2,7 +2,7 @@
 import logging
 from os import environ
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import toml
 from deepmerge import Merger
@@ -28,7 +28,7 @@ def get_section(section: str) -> dict[str, Any]:
     if not Path("config-default.toml").exists():
         raise MetricityConfigurationError("config-default.toml is missing")
 
-    with open("config-default.toml", "r") as default_config_file:
+    with Path.open("config-default.toml") as default_config_file:
         default_config = toml.load(default_config_file)
 
     # Load user configuration
@@ -36,25 +36,23 @@ def get_section(section: str) -> dict[str, Any]:
     user_config_location = Path(environ.get("CONFIG_LOCATION", "./config.toml"))
 
     if user_config_location.exists():
-        with open(user_config_location, "r") as user_config_file:
+        with Path.open(user_config_location) as user_config_file:
             user_config = toml.load(user_config_file)
 
     # Merge the configuration
     merger = Merger(
         [
-            (dict, "merge")
+            (dict, "merge"),
         ],
         ["override"],
-        ["override"]
+        ["override"],
     )
 
     conf = merger.merge(default_config, user_config)
 
     # Check whether we are missing the requested section
     if not conf.get(section):
-        raise MetricityConfigurationError(
-            f"Config is missing section '{section}'"
-        )
+        raise MetricityConfigurationError(f"Config is missing section '{section}'")
 
     return conf[section]
 
@@ -66,34 +64,30 @@ class ConfigSection(type):
         cls: type,
         name: str,
         bases: tuple[type],
-        dictionary: dict[str, Any]
+        dictionary: dict[str, Any],
     ) -> type:
         """Use the section attr in the subclass to fill in the values from the TOML."""
         config = get_section(dictionary["section"])
 
-        log.info(f"Loading configuration section {dictionary['section']}")
+        log.info("Loading configuration section %s", dictionary["section"])
 
         for key, value in config.items():
-            if isinstance(value, dict):
-                if env_var := value.get("env"):
-                    if env_value := environ.get(env_var):
-                        config[key] = env_value
-                    else:
-                        if not value.get("optional"):
-                            raise MetricityConfigurationError(
-                                f"Required config option '{key}' in"
-                                f" '{dictionary['section']}' is missing, either set"
-                                f" the environment variable {env_var} or override "
-                                "it in your config.toml file"
-                            )
-                        else:
-                            config[key] = None
+            if isinstance(value, dict) and (env_var := value.get("env")):
+                if env_value := environ.get(env_var):
+                    config[key] = env_value
+                elif not value.get("optional"):
+                    raise MetricityConfigurationError(
+                        f"Required config option '{key}' in"
+                        f" '{dictionary['section']}' is missing, either set"
+                        f" the environment variable {env_var} or override "
+                        "it in your config.toml file",
+                    )
+                else:
+                    config[key] = None
 
         dictionary.update(config)
 
-        config_section = super().__new__(cls, name, bases, dictionary)
-
-        return config_section
+        return super().__new__(cls, name, bases, dictionary)
 
 
 class PythonConfig(metaclass=ConfigSection):
@@ -125,10 +119,10 @@ class DatabaseConfig(metaclass=ConfigSection):
 
     section = "database"
 
-    uri: Optional[str]
+    uri: str | None
 
-    host: Optional[str]
-    port: Optional[int]
-    database: Optional[str]
-    username: Optional[str]
-    password: Optional[str]
+    host: str | None
+    port: int | None
+    database: str | None
+    username: str | None
+    password: str | None

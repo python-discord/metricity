@@ -23,10 +23,10 @@ class Bot(BotBase):
     async def setup_hook(self) -> None:
         """Connect to db and load cogs."""
         await super().setup_hook()
-        log.info(f"Metricity is online, logged in as {self.user}")
+        log.info("Metricity is online, logged in as %s", self.user)
         await connect()
         await self.load_extensions(exts)
 
-    async def on_error(self, event: str, *args, **kwargs) -> None:
+    async def on_error(self, event: str, *_args, **_kwargs) -> None:
         """Log errors raised in event listeners rather than printing them to stderr."""
-        log.exception(f"Unhandled exception in {event}.")
+        log.exception("Unhandled exception in %s", event)

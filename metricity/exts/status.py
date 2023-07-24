@@ -9,7 +9,7 @@ from metricity.config import BotConfig
 DESCRIPTIONS = (
     "Command processing time",
     "Last event received",
-    "Discord API latency"
+    "Discord API latency",
 )
 ROUND_LATENCY = 3
 INTRO_MESSAGE = "Hello, I'm {name}. I insert all your data into a GDPR-compliant database."
@@ -49,7 +49,7 @@ class Status(commands.Cog):
             description=INTRO_MESSAGE.format(name=ctx.guild.me.display_name),
         )
 
-        for desc, latency in zip(DESCRIPTIONS, (bot_ping, last_event, discord_ping)):
+        for desc, latency in zip(DESCRIPTIONS, (bot_ping, last_event, discord_ping), strict=True):
             embed.add_field(name=desc, value=latency, inline=False)
 
         await ctx.send(embed=embed)
