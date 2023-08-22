@@ -9,20 +9,20 @@ license = "MIT"
 python = "3.10.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "10.0.0"
+pydis-core = "10.1.0"
 
-alembic = "1.11.1"
+alembic = "1.11.3"
 aiohttp = "3.8.4"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
 gino = "1.0.1"
 python-dotenv = "1.0.0"
-psycopg2-binary = "2.9.6"
+psycopg2-binary = "2.9.7"
 toml = "0.10.2"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "3.3.3"
-ruff = "0.0.280"
+ruff = "0.0.285"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
