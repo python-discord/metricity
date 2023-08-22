@@ -1,0 +1,77 @@
+name: Deploy to production
+
+on:
+  workflow_call:
+    inputs:
+      sha-tag:
+        description: "A short-form SHA tag for the commit that triggered this workflow"
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build & Publish Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # The current version (v2) of Docker's build-push action uses
+      # buildx, which comes with BuildKit features that help us speed
+      # up our builds using additional cache features. Buildx also
+      # has a lot of other features that are not as relevant to us.
+      #
+      # See https://github.com/docker/build-push-action
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate docker image metadata
+        uses: docker/metadata-action@v4
+        id: meta
+        with:
+          images: ghcr.io/python-discord/metricity
+          tags: |
+            type=sha
+            type=raw,value=latest
+            type=semver,pattern=v{{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') }}
+          cache-from: type=registry,ref=ghcr.io/python-discord/metricity:latest
+          cache-to: type=inline
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            git_sha=${{ github.sha }}
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: azure/setup-kubectl@v3
+
+      - name: Authenticate with Kubernetes
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v4
+        with:
+          manifests: |
+              deployment.yaml
+          images: 'ghcr.io/python-discord/metricity:${{ inputs.sha-tag }}'

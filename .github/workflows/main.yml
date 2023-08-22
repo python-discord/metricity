@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  release:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+
+  generate-sha-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      sha-tag: ${{ steps.sha-tag.outputs.sha-tag }}
+    steps:
+      - name: Create SHA Container tag
+        id: sha-tag
+        run: |
+          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
+          echo "sha-tag=$tag" >> $GITHUB_OUTPUT
+
+  build-deploy:
+    uses: ./.github/workflows/build-deploy.yml
+    needs:
+      - lint
+      - generate-sha-tag
+    with:
+      sha-tag: ${{ needs.generate-sha-tag.outputs.sha-tag }}
+    secrets: inherit
