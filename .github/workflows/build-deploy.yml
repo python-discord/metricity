@@ -39,7 +39,7 @@ jobs:
         with:
           images: ghcr.io/python-discord/metricity
           tags: |
-            type=sha
+            type=raw,value=${{ inputs.sha-tag }}
             type=raw,value=latest
             type=semver,pattern=v{{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
 
