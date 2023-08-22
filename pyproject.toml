@@ -22,7 +22,7 @@ toml = "0.10.2"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "3.3.3"
-ruff = "0.0.280"
+ruff = "0.0.285"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
