@@ -25,10 +25,11 @@ def get_section(section: str) -> dict[str, Any]:
     and override that of config-default.toml.
     """
     # Load default configuration
-    if not Path("config-default.toml").exists():
+    default_config_file = Path("config-default.toml")
+    if not default_config_file.exists():
         raise MetricityConfigurationError("config-default.toml is missing")
 
-    with Path.open("config-default.toml") as default_config_file:
+    with default_config_file.open() as default_config_file:
         default_config = toml.load(default_config_file)
 
     # Load user configuration
