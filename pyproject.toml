@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metricity"
-version = "2.0.1"
+version = "2.1.0"
 description = "Advanced metric collection for the Python Discord server"
 authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
@@ -9,9 +9,9 @@ license = "MIT"
 python = "3.10.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "9.6.0"
+pydis-core = "10.0.0"
 
-alembic = "1.10.3"
+alembic = "1.11.1"
 aiohttp = "3.8.4"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
@@ -21,10 +21,8 @@ psycopg2-binary = "2.9.6"
 toml = "0.10.2"
 
 [tool.poetry.dev-dependencies]
-flake8 = "6.0.0"
-flake8-annotations = "3.0.0"
-flake8-docstrings = "1.7.0"
-flake8-import-order = "0.18.2"
+pre-commit = "3.3.3"
+ruff = "0.0.280"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
@@ -32,3 +30,20 @@ start = "metricity.__main__:start"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = [".cache", "alembic"]
+ignore = [
+    "ANN002", "ANN003", "ANN101",
+    "C901",
+    "D100", "D104", "D105", "D107", "D203", "D212", "D214", "D215", "D416",
+    "EM",
+    "PLR0912",
+    "TRY003",
+]
+line-length = 120
+select = ["ALL"]
+
+[tool.ruff.per-file-ignores]
+"metricity/models.py" = ["A003"]

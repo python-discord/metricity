@@ -33,9 +33,8 @@ class GuildListeners(commands.Cog):
         log.info("Beginning user synchronisation process")
         await models.User.update.values(in_guild=False).gino.status()
 
-        users = []
-        for user in guild.members:
-            users.append({
+        users = [
+            {
                 "id": str(user.id),
                 "name": user.name,
                 "avatar_hash": getattr(user.avatar, "key", None),
@@ -46,15 +45,17 @@ class GuildListeners(commands.Cog):
                 "bot": user.bot,
                 "in_guild": True,
                 "public_flags": dict(user.public_flags),
-                "pending": user.pending
-            })
+                "pending": user.pending,
+            }
+            for user in guild.members
+        ]
 
-        log.info(f"Performing bulk upsert of {len(users)} rows")
+        log.info("Performing bulk upsert of %d rows", len(users))
 
         user_chunks = discord.utils.as_chunks(users, 500)
 
         for chunk in user_chunks:
-            log.info(f"Upserting chunk of {len(chunk)}")
+            log.info("Upserting chunk of %d", len(chunk))
             await models.User.bulk_upsert(chunk)
 
         log.info("User upsert complete")
@@ -85,15 +86,14 @@ class GuildListeners(commands.Cog):
         log.info("Category synchronisation process complete, synchronising channels")
 
         for channel in guild.channels:
-            if channel.category:
-                if channel.category.id in BotConfig.ignore_categories:
-                    continue
+            if channel.category and channel.category.id in BotConfig.ignore_categories:
+                continue
 
             if not isinstance(channel, discord.CategoryChannel):
                 category_id = str(channel.category.id) if channel.category else None
                 # Cast to bool so is_staff is False if channel.category is None
                 is_staff = channel.id in BotConfig.staff_channels or bool(
-                    channel.category and channel.category.id in BotConfig.staff_categories
+                    channel.category and channel.category.id in BotConfig.staff_categories,
                 )
                 if db_chan := await models.Channel.get(str(channel.id)):
                     await db_chan.update(
@@ -145,7 +145,7 @@ class GuildListeners(commands.Cog):
     async def on_guild_channel_update(
         self,
         _before: discord.abc.GuildChannel,
-        channel: discord.abc.GuildChannel
+        channel: discord.abc.GuildChannel,
     ) -> None:
         """Sync the channels when one is updated."""
         if channel.guild.id != BotConfig.guild_id:
@@ -172,7 +172,7 @@ class GuildListeners(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_available(self, guild: discord.Guild) -> None:
         """Synchronize the user table with the Discord users."""
-        log.info(f"Received guild available for {guild.id}")
+        log.info("Received guild available for %d", guild.id)
 
         if guild.id != BotConfig.guild_id:
             log.info("Guild was not the configured guild, discarding event")

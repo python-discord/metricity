@@ -1,7 +1,7 @@
 """Database models used by Metricity for statistic collection."""
 
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any
 
 from sqlalchemy.dialects.postgresql import insert
 
@@ -27,7 +27,7 @@ class Channel(db.Model):
     category_id = db.Column(
         db.String,
         db.ForeignKey("categories.id", ondelete="CASCADE"),
-        nullable=True
+        nullable=True,
     )
     is_staff = db.Column(db.Boolean, nullable=False)
 
@@ -41,7 +41,7 @@ class Thread(db.Model):
     parent_channel_id = db.Column(
         db.String,
         db.ForeignKey("channels.id", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
     )
     created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
     name = db.Column(db.String, nullable=False)
@@ -69,7 +69,7 @@ class User(db.Model):
     pending = db.Column(db.Boolean, default=False)
 
     @classmethod
-    def bulk_upsert(cls: type, users: List[Dict[str, Any]]) -> Any:
+    def bulk_upsert(cls: type, users: list[dict[str, Any]]) -> Any:  # noqa: ANN401
         """Perform a bulk insert/update of the database to sync the user table."""
         qs = insert(cls.__table__).values(users)
 
@@ -82,12 +82,12 @@ class User(db.Model):
             "bot",
             "in_guild",
             "public_flags",
-            "pending"
+            "pending",
         ]
 
         return qs.on_conflict_do_update(
             index_elements=[cls.id],
-            set_={k: getattr(qs.excluded, k) for k in update_cols}
+            set_={k: getattr(qs.excluded, k) for k in update_cols},
         ).returning(cls.__table__).gino.all()
 
 
@@ -100,17 +100,17 @@ class Message(db.Model):
     channel_id = db.Column(
         db.String,
         db.ForeignKey("channels.id", ondelete="CASCADE"),
-        index=True
+        index=True,
     )
     thread_id = db.Column(
         db.String,
         db.ForeignKey("threads.id", ondelete="CASCADE"),
-        index=True
+        index=True,
     )
     author_id = db.Column(
         db.String,
         db.ForeignKey("users.id", ondelete="CASCADE"),
-        index=True
+        index=True,
     )
     created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
     is_deleted = db.Column(db.Boolean, default=False)

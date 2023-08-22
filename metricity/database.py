@@ -45,17 +45,15 @@ class TZDateTime(TypeDecorator):
     impl = DateTime
     cache_ok = True
 
-    def process_bind_param(self, value: datetime, dialect: Dialect) -> datetime:
+    def process_bind_param(self, value: datetime, _dialect: Dialect) -> datetime:
         """Convert the value to aware before saving to db."""
         if value is not None:
             if not value.tzinfo:
                 raise TypeError("tzinfo is required")
-            value = value.astimezone(timezone.utc).replace(
-                tzinfo=None
-            )
+            value = value.astimezone(timezone.utc).replace(tzinfo=None)
         return value
 
-    def process_result_value(self, value: datetime, dialect: Dialect) -> datetime:
+    def process_result_value(self, value: datetime, _dialect: Dialect) -> datetime:
         """Convert the value to aware before passing back to user-land."""
         if value is not None:
             value = value.replace(tzinfo=timezone.utc)

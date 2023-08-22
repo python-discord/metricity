@@ -8,16 +8,14 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 
 def parse_db_url(db_url: str) -> SplitResult:
-    """Validate and split the given databse url."""
+    """Validate and split the given database url."""
     db_url_parts = urlsplit(db_url)
     if not all((
         db_url_parts.hostname,
         db_url_parts.username,
-        db_url_parts.password
+        db_url_parts.password,
     )):
-        raise ValueError(
-            "The given db_url is not a valid PostgreSQL database URL."
-        )
+        raise ValueError("The given db_url is not a valid PostgreSQL database URL.")
     return db_url_parts
 
 
@@ -28,7 +26,7 @@ if __name__ == "__main__":
         host=database_parts.hostname,
         port=database_parts.port,
         user=database_parts.username,
-        password=database_parts.password
+        password=database_parts.password,
     )
 
     db_name = database_parts.path[1:] or "metricity"
@@ -39,8 +37,6 @@ if __name__ == "__main__":
         cursor.execute("SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s", (db_name,))
         exists = cursor.fetchone()
         if not exists:
-            print("Creating metricity database.")
-            cursor.execute(
-                sql.SQL("CREATE DATABASE {dbname}").format(dbname=sql.Identifier(db_name))
-            )
+            print("Creating metricity database.")  # noqa: T201
+            cursor.execute(sql.SQL("CREATE DATABASE {dbname}").format(dbname=sql.Identifier(db_name)))
     conn.close()

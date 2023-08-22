@@ -24,7 +24,7 @@ class ErrorHandler(commands.Cog):
         return discord.Embed(
             title=title,
             colour=discord.Colour.red(),
-            description=body
+            description=body,
         )
 
     @commands.Cog.listener()
@@ -32,8 +32,11 @@ class ErrorHandler(commands.Cog):
         """Provide generic command error handling."""
         if isinstance(e, SUPPRESSED_ERRORS):
             log.debug(
-                f"Command {ctx.invoked_with} invoked by {ctx.message.author} with error "
-                f"{e.__class__.__name__}: {e}"
+                "Command %s invoked by %s with error %s: %s",
+                ctx.invoked_with,
+                ctx.message.author,
+                e.__class__.__name__,
+                e,
             )
 
 

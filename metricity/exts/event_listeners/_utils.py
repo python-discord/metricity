@@ -16,7 +16,7 @@ async def insert_thread(thread: discord.Thread) -> None:
     )
 
 
-async def sync_message(message: discord.Message, from_thread: bool) -> None:
+async def sync_message(message: discord.Message, *, from_thread: bool) -> None:
     """Sync the given message with the database."""
     if await models.Message.get(str(message.id)):
         return
@@ -25,7 +25,7 @@ async def sync_message(message: discord.Message, from_thread: bool) -> None:
         "id": str(message.id),
         "channel_id": str(message.channel.id),
         "author_id": str(message.author.id),
-        "created_at": message.created_at
+        "created_at": message.created_at,
     }
 
     if from_thread:

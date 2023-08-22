@@ -5,7 +5,6 @@ import logging
 import os
 from typing import TYPE_CHECKING
 
-
 import coloredlogs
 from pydis_core.utils import apply_monkey_patches
 

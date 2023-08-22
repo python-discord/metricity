@@ -25,7 +25,7 @@ async def main() -> None:
         presences=False,
         messages=True,
         reactions=False,
-        typing=False
+        typing=False,
     )
 
     async with aiohttp.ClientSession() as session:
