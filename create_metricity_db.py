@@ -23,7 +23,8 @@ async def create_db() -> None:
     parts = parse_db_url(build_db_uri())
     try:
         await asyncpg.connect(
-            host=parts.netloc,
+            host=parts.hostname,
+            port=parts.port,
             user=parts.username,
             database=parts.path[1:],
             password=parts.password,
@@ -33,7 +34,8 @@ async def create_db() -> None:
         sys_conn = await asyncpg.connect(
             database="template1",
             user=parts.username,
-            host=parts.netloc,
+            host=parts.hostname,
+            port=parts.port,
             password=parts.password,
         )
 
