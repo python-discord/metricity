@@ -33,20 +33,14 @@ staff_categories = [
     787641585624940544,
     412287621704843264,
     881573419878076456,
-    820711852652494868
+    820711852652494868,
 ]
 
 # Channels that should be flagged as staff only by channel ID
-staff_channels =[
-    412375055910043655
-]
+staff_channels = [412375055910043655]
 
 # Don't report messages for the following categories
-ignore_categories = [
-    714494672835444826,
-    890331800025563216,
-    895417395261341766
-]
+ignore_categories = [714494672835444826, 890331800025563216, 895417395261341766]
 
 [database]
 # Postgres!
@@ -62,3 +56,6 @@ port = 5432
 database = "metricity"
 username = "postgres"
 password = "postgres"
+
+# Log all queries (SQLAlchemy echo)
+log_queries = false
