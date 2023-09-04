@@ -15,5 +15,8 @@ jobs:
       with:
         python_version: '3.11'
 
+    - name: Run pre-commit hooks
+      run: SKIP=ruff pre-commit run --all-files
+
     - name: Lint code with ruff
       run: ruff check --format=github .
