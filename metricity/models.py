@@ -1,6 +1,6 @@
 """Database models used by Metricity for statistic collection."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy.dialects.postgresql import insert
@@ -43,7 +43,7 @@ class Thread(db.Model):
         db.ForeignKey("channels.id", ondelete="CASCADE"),
         nullable=False,
     )
-    created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
+    created_at = db.Column(TZDateTime(), default=datetime.now(UTC))
     name = db.Column(db.String, nullable=False)
     archived = db.Column(db.Boolean, default=False, nullable=False)
     auto_archive_duration = db.Column(db.Integer, nullable=False)
@@ -112,5 +112,5 @@ class Message(db.Model):
         db.ForeignKey("users.id", ondelete="CASCADE"),
         index=True,
     )
-    created_at = db.Column(TZDateTime(), default=datetime.now(timezone.utc))
+    created_at = db.Column(TZDateTime(), default=datetime.now(UTC))
     is_deleted = db.Column(db.Boolean, default=False)

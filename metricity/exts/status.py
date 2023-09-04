@@ -24,7 +24,7 @@ class Status(commands.Cog):
     @commands.Cog.listener()
     async def on_socket_event_type(self, _: str) -> None:
         """Store the last event received as an int."""
-        self.last_event_received = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+        self.last_event_received = int(datetime.datetime.now(datetime.UTC).timestamp())
 
     @commands.command()
     @commands.has_any_role(BotConfig.staff_role_id)
@@ -34,7 +34,7 @@ class Status(commands.Cog):
         if ctx.guild.id != BotConfig.guild_id:
             return
 
-        bot_ping = (datetime.datetime.now(datetime.timezone.utc) - ctx.message.created_at).total_seconds() * 1000
+        bot_ping = (datetime.datetime.now(datetime.UTC) - ctx.message.created_at).total_seconds() * 1000
         if bot_ping <= 0:
             bot_ping = "Your clock is out of sync, could not calculate ping."
         else:

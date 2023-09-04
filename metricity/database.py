@@ -1,7 +1,7 @@
 """General utility functions and classes for Metricity."""
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import gino
 from sqlalchemy.engine import Dialect
@@ -50,11 +50,11 @@ class TZDateTime(TypeDecorator):
         if value is not None:
             if not value.tzinfo:
                 raise TypeError("tzinfo is required")
-            value = value.astimezone(timezone.utc).replace(tzinfo=None)
+            value = value.astimezone(UTC).replace(tzinfo=None)
         return value
 
     def process_result_value(self, value: datetime, _dialect: Dialect) -> datetime:
         """Convert the value to aware before passing back to user-land."""
         if value is not None:
-            value = value.replace(tzinfo=timezone.utc)
+            value = value.replace(tzinfo=UTC)
         return value
