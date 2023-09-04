@@ -1,17 +1,16 @@
 """Database models used by Metricity for statistic collection."""
 
 from datetime import UTC, datetime
-from typing import Any, Optional
 
 from sqlalchemy import JSON, ForeignKey
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from metricity.database import TZDateTime
 
 
 class Base(DeclarativeBase):
-    pass
+    """Base class for all database models."""
+
 
 class Category(Base):
     """Database model representing a Discord category channel."""
