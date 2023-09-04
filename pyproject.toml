@@ -21,8 +21,8 @@ psycopg2-binary = "2.9.7"
 toml = "0.10.2"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "3.3.3"
-ruff = "0.0.285"
+pre-commit = "3.4.0"
+ruff = "0.0.287"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
