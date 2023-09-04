@@ -35,6 +35,8 @@ def upgrade() -> None:
     op.alter_column("users", "in_guild",
                existing_type=sa.BOOLEAN(),
                nullable=False)
+
+    op.execute("UPDATE users SET pending = FALSE WHERE pending IS NULL")
     op.alter_column("users", "pending",
                existing_type=sa.BOOLEAN(),
                nullable=False)
