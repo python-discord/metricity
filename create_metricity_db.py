@@ -11,7 +11,7 @@ def parse_db_url(db_url: str) -> SplitResult:
     """Validate and split the given database url."""
     db_url_parts = urlsplit(db_url)
     if not all((
-        db_url_parts.hostname,
+        db_url_parts.netloc,
         db_url_parts.username,
         db_url_parts.password,
     )):
@@ -23,7 +23,7 @@ async def create_db() -> None:
     parts = parse_db_url(build_db_uri())
     try:
         await asyncpg.connect(
-            host=parts.hostname,
+            host=parts.netloc,
             user=parts.username,
             database=parts.path[1:],
             password=parts.password,
@@ -33,7 +33,7 @@ async def create_db() -> None:
         sys_conn = await asyncpg.connect(
             database="template1",
             user=parts.username,
-            host=parts.hostname,
+            host=parts.netloc,
             password=parts.password,
         )
 

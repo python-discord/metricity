@@ -2,6 +2,7 @@
 
 import logging
 from datetime import UTC, datetime
+from urllib.parse import urlsplit
 
 from sqlalchemy.engine import Dialect
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
@@ -14,6 +15,11 @@ log = logging.getLogger(__name__)
 def build_db_uri() -> str:
     """Build the database uri from the config."""
     if DatabaseConfig.uri:
+        parsed = urlsplit(DatabaseConfig.uri)
+        if parsed.scheme != "postgresql+asyncpg":
+            log.debug("The given db_url did not use the asyncpg driver. Updating the db_url to use asyncpg.")
+            return parsed._replace(scheme="postgresql+asyncpg").geturl()
+
         return DatabaseConfig.uri
 
     return (
