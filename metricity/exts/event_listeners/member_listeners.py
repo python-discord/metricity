@@ -57,7 +57,7 @@ class MemberListeners(commands.Cog):
                 ))
             else:
                 with contextlib.suppress(UniqueViolationError):
-                    await sess.add(User(
+                    sess.add(User(
                         id=str(member.id),
                         name=member.name,
                         avatar_hash=getattr(member.avatar, "key", None),
