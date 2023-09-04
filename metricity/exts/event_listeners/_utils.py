@@ -14,6 +14,7 @@ def insert_thread(thread: discord.Thread, sess: AsyncSession) -> None:
         auto_archive_duration=thread.auto_archive_duration,
         locked=thread.locked,
         type=thread.type.name,
+        created_at=thread.created_at,
     ))
 
 
