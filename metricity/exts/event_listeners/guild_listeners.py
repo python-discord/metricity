@@ -1,5 +1,7 @@
 """An ext to listen for guild (and guild channel) events and syncs them to the database."""
 
+import math
+
 import discord
 from discord.ext import commands
 from pydis_core.utils import logging, scheduling
@@ -53,11 +55,12 @@ class GuildListeners(commands.Cog):
             for user in guild.members
         ]
 
-        log.info("Performing bulk upsert of %d rows", len(users))
-
         user_chunks = discord.utils.as_chunks(users, 500)
         created = 0
         updated = 0
+        total_users = len(users)
+
+        log.info("Performing bulk upsert of %d rows in %d chunks", total_users, math.ceil(total_users / 500))
 
         async with async_session() as sess:
             for chunk in user_chunks:
@@ -86,7 +89,7 @@ class GuildListeners(commands.Cog):
                 updated += [obj[0] != 0 for obj in objs].count(True)
 
                 log.info("User upsert: inserted %d rows, updated %d rows, done %d rows, %d rows remaining",
-                         created, updated, created + updated, len(users) - (created + updated))
+                         created, updated, created + updated, total_users - (created + updated))
 
             await sess.commit()
 
