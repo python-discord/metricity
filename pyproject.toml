@@ -9,10 +9,9 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "10.1.0"
+pydis-core = "10.2.0"
 
-alembic = "1.11.3"
-aiohttp = "3.8.4"
+alembic = "1.12.0"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
 gino = "1.0.1"
@@ -35,9 +34,19 @@ build-backend = "poetry.masonry.api"
 target-version = "py311"
 extend-exclude = [".cache", "alembic"]
 ignore = [
-    "ANN002", "ANN003", "ANN101",
+    "ANN002",
+    "ANN003",
+    "ANN101",
     "C901",
-    "D100", "D104", "D105", "D107", "D203", "D212", "D214", "D215", "D416",
+    "D100",
+    "D104",
+    "D105",
+    "D107",
+    "D203",
+    "D212",
+    "D214",
+    "D215",
+    "D416",
     "EM",
     "PLR0912",
     "TRY003",

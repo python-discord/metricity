@@ -18,4 +18,4 @@ If you alter the models then use `poetry run alembic revision -m "<What you chan
 
 ### Join us on Discord!
 
-If you are a Python programmer and want to meet fellow Pythonistas, come join us at <https://discord.gg/python>! 
+If you are a Python programmer and want to meet fellow Pythonistas, come join us at <https://discord.gg/python>!
