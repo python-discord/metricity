@@ -16,9 +16,11 @@ branch_labels = ${repr(branch_labels)}
 depends_on = ${repr(depends_on)}
 
 
-def upgrade():
-    ${upgrades if upgrades else "pass"}
+def upgrade() -> None:
+    """Apply the current migration."""
+    ${upgrades}
 
 
-def downgrade():
-    ${downgrades if downgrades else "pass"}
+def downgrade() -> None:
+    """Revert the current migration."""
+    ${downgrades}
