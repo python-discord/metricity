@@ -1,9 +1,11 @@
 """An ext to listen for guild (and guild channel) events and syncs them to the database."""
 
+import math
+
 import discord
 from discord.ext import commands
 from pydis_core.utils import logging, scheduling
-from sqlalchemy import update
+from sqlalchemy import column, update
 from sqlalchemy.dialects.postgresql import insert
 
 from metricity import models
@@ -53,14 +55,16 @@ class GuildListeners(commands.Cog):
             for user in guild.members
         ]
 
-        log.info("Performing bulk upsert of %d rows", len(users))
-
         user_chunks = discord.utils.as_chunks(users, 500)
+        created = 0
+        updated = 0
+        total_users = len(users)
+
+        log.info("Performing bulk upsert of %d rows in %d chunks", total_users, math.ceil(total_users / 500))
 
         async with async_session() as sess:
             for chunk in user_chunks:
-                log.info("Upserting chunk of %d", len(chunk))
-                qs = insert(models.User).values(chunk)
+                qs = insert(models.User).returning(column("xmax")).values(chunk)
 
                 update_cols = [
                     "name",
@@ -74,10 +78,18 @@ class GuildListeners(commands.Cog):
                     "pending",
                 ]
 
-                await sess.execute(qs.on_conflict_do_update(
+                res = await sess.execute(qs.on_conflict_do_update(
                     index_elements=[models.User.id],
                     set_={k: getattr(qs.excluded, k) for k in update_cols},
                 ))
+
+                objs = list(res)
+
+                created += [obj[0] == 0 for obj in objs].count(True)
+                updated += [obj[0] != 0 for obj in objs].count(True)
+
+                log.info("User upsert: inserted %d rows, updated %d rows, done %d rows, %d rows remaining",
+                         created, updated, created + updated, total_users - (created + updated))
 
             await sess.commit()
 
