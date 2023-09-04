@@ -3,15 +3,16 @@
 import discord
 from discord.ext import commands
 from pydis_core.utils import logging, scheduling
+from sqlalchemy import update
+from sqlalchemy.dialects.postgresql import insert
 
 from metricity import models
 from metricity.bot import Bot
 from metricity.config import BotConfig
-from metricity.database import db
+from metricity.database import async_session
 from metricity.exts.event_listeners import _utils
 
 log = logging.get_logger(__name__)
-
 
 class GuildListeners(commands.Cog):
     """Listen for guild (and guild channel) events and sync them to the database."""
@@ -31,7 +32,9 @@ class GuildListeners(commands.Cog):
         await self.sync_thread_archive_state(guild)
 
         log.info("Beginning user synchronisation process")
-        await models.User.update.values(in_guild=False).gino.status()
+        async with async_session() as sess:
+            await sess.execute(update(models.User).values(in_guild=False))
+            await sess.commit()
 
         users = [
             {
@@ -54,9 +57,29 @@ class GuildListeners(commands.Cog):
 
         user_chunks = discord.utils.as_chunks(users, 500)
 
-        for chunk in user_chunks:
-            log.info("Upserting chunk of %d", len(chunk))
-            await models.User.bulk_upsert(chunk)
+        async with async_session() as sess:
+            for chunk in user_chunks:
+                log.info("Upserting chunk of %d", len(chunk))
+                qs = insert(models.User).values(chunk)
+
+                update_cols = [
+                    "name",
+                    "avatar_hash",
+                    "guild_avatar_hash",
+                    "joined_at",
+                    "is_staff",
+                    "bot",
+                    "in_guild",
+                    "public_flags",
+                    "pending",
+                ]
+
+                await sess.execute(qs.on_conflict_do_update(
+                    index_elements=[models.User.id],
+                    set_={k: getattr(qs.excluded, k) for k in update_cols},
+                ))
+
+            await sess.commit()
 
         log.info("User upsert complete")
 
@@ -66,9 +89,19 @@ class GuildListeners(commands.Cog):
     async def sync_thread_archive_state(guild: discord.Guild) -> None:
         """Sync the archive state of all threads in the database with the state in guild."""
         active_thread_ids = [str(thread.id) for thread in guild.threads]
-        async with db.transaction() as tx:
-            async for db_thread in tx.connection.iterate(models.Thread.query):
-                await db_thread.update(archived=db_thread.id not in active_thread_ids).apply()
+
+        async with async_session() as sess:
+            await sess.execute(
+                update(models.Thread)
+                .where(models.Thread.id.in_(active_thread_ids))
+                .values(archived=False),
+            )
+            await sess.execute(
+                update(models.Thread)
+                .where(~models.Thread.id.in_(active_thread_ids))
+                .values(archived=True),
+            )
+            await sess.commit()
 
     async def sync_channels(self, guild: discord.Guild) -> None:
         """Sync channels and categories with the database."""
@@ -76,59 +109,61 @@ class GuildListeners(commands.Cog):
 
         log.info("Beginning category synchronisation process")
 
-        for channel in guild.channels:
-            if isinstance(channel, discord.CategoryChannel):
-                if db_cat := await models.Category.get(str(channel.id)):
-                    await db_cat.update(name=channel.name).apply()
-                else:
-                    await models.Category.create(id=str(channel.id), name=channel.name)
+        async with async_session() as sess:
+            for channel in guild.channels:
+                if isinstance(channel, discord.CategoryChannel):
+                    if existing_cat := await sess.get(models.Category, str(channel.id)):
+                        existing_cat.name = channel.name
+                    else:
+                        sess.add(models.Category(id=str(channel.id), name=channel.name))
+
+            await sess.commit()
 
         log.info("Category synchronisation process complete, synchronising channels")
 
-        for channel in guild.channels:
-            if channel.category and channel.category.id in BotConfig.ignore_categories:
-                continue
+        async with async_session() as sess:
+            for channel in guild.channels:
+                if channel.category and channel.category.id in BotConfig.ignore_categories:
+                    continue
 
-            if not isinstance(channel, discord.CategoryChannel):
-                category_id = str(channel.category.id) if channel.category else None
-                # Cast to bool so is_staff is False if channel.category is None
-                is_staff = channel.id in BotConfig.staff_channels or bool(
-                    channel.category and channel.category.id in BotConfig.staff_categories,
-                )
-                if db_chan := await models.Channel.get(str(channel.id)):
-                    await db_chan.update(
-                        name=channel.name,
-                        category_id=category_id,
-                        is_staff=is_staff,
-                    ).apply()
-                else:
-                    await models.Channel.create(
-                        id=str(channel.id),
-                        name=channel.name,
-                        category_id=category_id,
-                        is_staff=is_staff,
+                if not isinstance(channel, discord.CategoryChannel):
+                    category_id = str(channel.category.id) if channel.category else None
+                    # Cast to bool so is_staff is False if channel.category is None
+                    is_staff = channel.id in BotConfig.staff_channels or bool(
+                        channel.category and channel.category.id in BotConfig.staff_categories,
                     )
+                    if db_chan := await sess.get(models.Channel, str(channel.id)):
+                        db_chan.name = channel.name
+                    else:
+                        sess.add(models.Channel(
+                            id=str(channel.id),
+                            name=channel.name,
+                            category_id=category_id,
+                            is_staff=is_staff,
+                        ))
+
+            await sess.commit()
 
         log.info("Channel synchronisation process complete, synchronising threads")
 
-        for thread in guild.threads:
-            if thread.parent and thread.parent.category:
-                if thread.parent.category.id in BotConfig.ignore_categories:
+        async with async_session() as sess:
+            for thread in guild.threads:
+                if thread.parent and thread.parent.category:
+                    if thread.parent.category.id in BotConfig.ignore_categories:
+                        continue
+                else:
+                    # This is a forum channel, not currently supported by Discord.py. Ignore it.
                     continue
-            else:
-                # This is a forum channel, not currently supported by Discord.py. Ignore it.
-                continue
 
-            if db_thread := await models.Thread.get(str(thread.id)):
-                await db_thread.update(
-                    name=thread.name,
-                    archived=thread.archived,
-                    auto_archive_duration=thread.auto_archive_duration,
-                    locked=thread.locked,
-                    type=thread.type.name,
-                ).apply()
-            else:
-                await _utils.insert_thread(thread)
+                if db_thread := await sess.get(models.Thread, str(thread.id)):
+                    db_thread.name = thread.name
+                    db_thread.archived = thread.archived
+                    db_thread.auto_archive_duration = thread.auto_archive_duration
+                    db_thread.locked = thread.locked
+                    db_thread.type = thread.type.name
+                else:
+                    _utils.insert_thread(thread, sess)
+            await sess.commit()
 
         log.info("Thread synchronisation process complete, finished synchronising guild.")
         self.bot.channel_sync_in_progress.set()

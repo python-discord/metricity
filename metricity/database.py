@@ -2,35 +2,33 @@
 
 import logging
 from datetime import UTC, datetime
+from urllib.parse import urlsplit
 
-import gino
 from sqlalchemy.engine import Dialect
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 from sqlalchemy.types import DateTime, TypeDecorator
 
 from metricity.config import DatabaseConfig
 
 log = logging.getLogger(__name__)
 
-db = gino.Gino()
-
-
 def build_db_uri() -> str:
-    """Use information from the config file to build a PostgreSQL URI."""
+    """Build the database uri from the config."""
     if DatabaseConfig.uri:
+        parsed = urlsplit(DatabaseConfig.uri)
+        if parsed.scheme != "postgresql+asyncpg":
+            log.debug("The given db_url did not use the asyncpg driver. Updating the db_url to use asyncpg.")
+            return parsed._replace(scheme="postgresql+asyncpg").geturl()
+
         return DatabaseConfig.uri
 
     return (
-        f"postgresql://{DatabaseConfig.username}:{DatabaseConfig.password}"
+        f"postgresql+asyncpg://{DatabaseConfig.username}:{DatabaseConfig.password}"
         f"@{DatabaseConfig.host}:{DatabaseConfig.port}/{DatabaseConfig.database}"
     )
 
-
-async def connect() -> None:
-    """Initiate a connection to the database."""
-    log.info("Initiating connection to the database")
-    await db.set_bind(build_db_uri())
-    log.info("Database connection established")
-
+engine: AsyncEngine = create_async_engine(build_db_uri(), echo=DatabaseConfig.log_queries)
+async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 class TZDateTime(TypeDecorator):
     """

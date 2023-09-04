@@ -127,3 +127,5 @@ class DatabaseConfig(metaclass=ConfigSection):
     database: str | None
     username: str | None
     password: str | None
+
+    log_queries: bool | None

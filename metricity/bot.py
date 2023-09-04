@@ -6,7 +6,6 @@ from pydis_core import BotBase
 from pydis_core.utils import logging
 
 from metricity import exts
-from metricity.database import connect
 
 log = logging.get_logger(__name__)
 
@@ -24,7 +23,6 @@ class Bot(BotBase):
         """Connect to db and load cogs."""
         await super().setup_hook()
         log.info("Metricity is online, logged in as %s", self.user)
-        await connect()
         await self.load_extensions(exts)
 
     async def on_error(self, event: str, *_args, **_kwargs) -> None:
