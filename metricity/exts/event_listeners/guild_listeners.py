@@ -85,8 +85,8 @@ class GuildListeners(commands.Cog):
                 created += [obj[0] == 0 for obj in objs].count(True)
                 updated += [obj[0] != 0 for obj in objs].count(True)
 
-                log.info("User upsert: inserted %d rows, updated %d rows, total %d rows",
-                         created, updated, created + updated)
+                log.info("User upsert: inserted %d rows, updated %d rows, done %d rows, %d rows remaining",
+                         created, updated, created + updated, len(users) - (created + updated))
 
             await sess.commit()
 
