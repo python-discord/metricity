@@ -3,9 +3,11 @@
 import asyncio
 import logging
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import coloredlogs
+import toml
 from pydis_core.utils import apply_monkey_patches
 
 from metricity.config import PythonConfig
@@ -13,7 +15,11 @@ from metricity.config import PythonConfig
 if TYPE_CHECKING:
     from metricity.bot import Bot
 
-__version__ = "2.0.1"
+# Read the version from the pyproject.toml file.
+with Path.open("pyproject.toml") as f:
+    package_vers = toml.load(f)["tool"]["poetry"]["version"]
+
+__version__ = package_vers
 
 # Set root log level
 logging.basicConfig(level=PythonConfig.log_level)
