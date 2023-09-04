@@ -5,9 +5,11 @@ import contextlib
 import discord
 from asyncpg.exceptions import UniqueViolationError
 from discord.ext import commands
+from sqlalchemy import update
 
 from metricity.bot import Bot
 from metricity.config import BotConfig
+from metricity.database import async_session
 from metricity.models import User
 
 
@@ -25,10 +27,11 @@ class MemberListeners(commands.Cog):
         if member.guild.id != BotConfig.guild_id:
             return
 
-        if db_user := await User.get(str(member.id)):
-            await db_user.update(
-                in_guild=False,
-            ).apply()
+        async with async_session() as sess:
+            await sess.execute(
+                update(User).where(User.id == str(member.id)).values(in_guild=False),
+            )
+            await sess.commit()
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member) -> None:
@@ -38,22 +41,9 @@ class MemberListeners(commands.Cog):
         if member.guild.id != BotConfig.guild_id:
             return
 
-        if db_user := await User.get(str(member.id)):
-            await db_user.update(
-                id=str(member.id),
-                name=member.name,
-                avatar_hash=getattr(member.avatar, "key", None),
-                guild_avatar_hash=getattr(member.guild_avatar, "key", None),
-                joined_at=member.joined_at,
-                created_at=member.created_at,
-                is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
-                public_flags=dict(member.public_flags),
-                pending=member.pending,
-                in_guild=True,
-            ).apply()
-        else:
-            with contextlib.suppress(UniqueViolationError):
-                await User.create(
+        async with async_session() as sess:
+            if await sess.get(User, str(member.id)):
+                await sess.execute(update(User).where(User.id == str(member.id)).values(
                     id=str(member.id),
                     name=member.name,
                     avatar_hash=getattr(member.avatar, "key", None),
@@ -64,7 +54,23 @@ class MemberListeners(commands.Cog):
                     public_flags=dict(member.public_flags),
                     pending=member.pending,
                     in_guild=True,
-                )
+                ))
+            else:
+                with contextlib.suppress(UniqueViolationError):
+                    await sess.add(User(
+                        id=str(member.id),
+                        name=member.name,
+                        avatar_hash=getattr(member.avatar, "key", None),
+                        guild_avatar_hash=getattr(member.guild_avatar, "key", None),
+                        joined_at=member.joined_at,
+                        created_at=member.created_at,
+                        is_staff=BotConfig.staff_role_id in [role.id for role in member.roles],
+                        public_flags=dict(member.public_flags),
+                        pending=member.pending,
+                        in_guild=True,
+                    ))
+
+            await sess.commit()
 
     @commands.Cog.listener()
     async def on_member_update(self, _before: discord.Member, member: discord.Member) -> None:
@@ -80,41 +86,43 @@ class MemberListeners(commands.Cog):
 
         roles = {role.id for role in member.roles}
 
-        if db_user := await User.get(str(member.id)):
-            if (
-                db_user.name != member.name or
-                db_user.avatar_hash != getattr(member.avatar, "key", None) or
-                db_user.guild_avatar_hash != getattr(member.guild_avatar, "key", None) or
-                BotConfig.staff_role_id in
-                [role.id for role in member.roles] != db_user.is_staff
-                or db_user.pending is not member.pending
-            ):
-                await db_user.update(
-                    id=str(member.id),
-                    name=member.name,
-                    avatar_hash=getattr(member.avatar, "key", None),
-                    guild_avatar_hash=getattr(member.guild_avatar, "key", None),
-                    joined_at=member.joined_at,
-                    created_at=member.created_at,
-                    is_staff=BotConfig.staff_role_id in roles,
-                    public_flags=dict(member.public_flags),
-                    in_guild=True,
-                    pending=member.pending,
-                ).apply()
-        else:
-            with contextlib.suppress(UniqueViolationError):
-                await User.create(
-                    id=str(member.id),
-                    name=member.name,
-                    avatar_hash=getattr(member.avatar, "key", None),
-                    guild_avatar_hash=getattr(member.guild_avatar, "key", None),
-                    joined_at=member.joined_at,
-                    created_at=member.created_at,
-                    is_staff=BotConfig.staff_role_id in roles,
-                    public_flags=dict(member.public_flags),
-                    in_guild=True,
-                    pending=member.pending,
-                )
+        async with async_session() as sess:
+            if db_user := await sess.get(User, str(member.id)):
+                if (
+                    db_user.name != member.name or
+                    db_user.avatar_hash != getattr(member.avatar, "key", None) or
+                    db_user.guild_avatar_hash != getattr(member.guild_avatar, "key", None) or
+                    (BotConfig.staff_role_id in roles) != db_user.is_staff
+                    or db_user.pending is not member.pending
+                ):
+                    await sess.execute(update(User).where(User.id == str(member.id)).values(
+                        id=str(member.id),
+                        name=member.name,
+                        avatar_hash=getattr(member.avatar, "key", None),
+                        guild_avatar_hash=getattr(member.guild_avatar, "key", None),
+                        joined_at=member.joined_at,
+                        created_at=member.created_at,
+                        is_staff=BotConfig.staff_role_id in roles,
+                        public_flags=dict(member.public_flags),
+                        in_guild=True,
+                        pending=member.pending,
+                    ))
+            else:
+                with contextlib.suppress(UniqueViolationError):
+                    sess.add(User(
+                        id=str(member.id),
+                        name=member.name,
+                        avatar_hash=getattr(member.avatar, "key", None),
+                        guild_avatar_hash=getattr(member.guild_avatar, "key", None),
+                        joined_at=member.joined_at,
+                        created_at=member.created_at,
+                        is_staff=BotConfig.staff_role_id in roles,
+                        public_flags=dict(member.public_flags),
+                        in_guild=True,
+                        pending=member.pending,
+                    ))
+
+            await sess.commit()
 
 
 

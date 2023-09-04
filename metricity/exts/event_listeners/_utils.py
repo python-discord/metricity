@@ -1,11 +1,12 @@
 import discord
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from metricity import models
 
 
-async def insert_thread(thread: discord.Thread) -> None:
-    """Insert the given thread to the database."""
-    await models.Thread.create(
+def insert_thread(thread: discord.Thread, sess: AsyncSession) -> None:
+    """Insert the given thread to the database session."""
+    sess.add(models.Thread(
         id=str(thread.id),
         parent_channel_id=str(thread.parent_id),
         name=thread.name,
@@ -13,12 +14,12 @@ async def insert_thread(thread: discord.Thread) -> None:
         auto_archive_duration=thread.auto_archive_duration,
         locked=thread.locked,
         type=thread.type.name,
-    )
+    ))
 
 
-async def sync_message(message: discord.Message, *, from_thread: bool) -> None:
+async def sync_message(message: discord.Message, sess: AsyncSession, *, from_thread: bool) -> None:
     """Sync the given message with the database."""
-    if await models.Message.get(str(message.id)):
+    if await sess.get(models.Message, str(message.id)):
         return
 
     args = {
@@ -33,4 +34,4 @@ async def sync_message(message: discord.Message, *, from_thread: bool) -> None:
         args["channel_id"] = str(thread.parent_id)
         args["thread_id"] = str(thread.id)
 
-    await models.Message.create(**args)
+    sess.add(models.Message(**args))
