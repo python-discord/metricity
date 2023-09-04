@@ -52,14 +52,19 @@ class GuildListeners(commands.Cog):
             }
             for user in guild.members
         ]
-
-        log.info("Performing bulk upsert of %d rows", len(users))
-
-        user_chunks = discord.utils.as_chunks(users, 500)
+        total_users = len(users)
+        log.info("Performing bulk upsert of %d rows", total_users)
+        chunk_size = 500
+        user_chunks = discord.utils.as_chunks(users, chunk_size)
 
         async with async_session() as sess:
-            for chunk in user_chunks:
-                log.info("Upserting chunk of %d", len(chunk))
+            for i, chunk in enumerate(user_chunks, 1):
+                log.info(
+                    "Upserting chunk of %d (%d/%d)",
+                    len(chunk),
+                    chunk_size*i,
+                    total_users,
+                )
                 qs = insert(models.User).values(chunk)
 
                 update_cols = [
