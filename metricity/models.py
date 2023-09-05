@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, ForeignKey
+from sqlalchemy import ForeignKey, JSON
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from metricity.database import TZDateTime
