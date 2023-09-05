@@ -54,6 +54,11 @@ ignore = [
 line-length = 120
 select = ["ALL"]
 
+[tool.ruff.isort]
+order-by-type = false
+case-sensitive = true
+combine-as-imports = true
+
 [tool.ruff.per-file-ignores]
 "metricity/models.py" = ["A003"]
 "alembic/*" = ["INP001"]
