@@ -1,10 +1,10 @@
 """Configuration reader for Metricity."""
 import logging
+import tomllib
 from os import environ
 from pathlib import Path
 from typing import Any
 
-import toml
 from deepmerge import Merger
 from dotenv import load_dotenv
 
@@ -29,16 +29,16 @@ def get_section(section: str) -> dict[str, Any]:
     if not default_config_file.exists():
         raise MetricityConfigurationError("config-default.toml is missing")
 
-    with default_config_file.open() as default_config_file:
-        default_config = toml.load(default_config_file)
+    with default_config_file.open("rb") as default_config_file:
+        default_config = tomllib.load(default_config_file)
 
     # Load user configuration
     user_config = {}
     user_config_location = Path(environ.get("CONFIG_LOCATION", "./config.toml"))
 
     if user_config_location.exists():
-        with Path.open(user_config_location) as user_config_file:
-            user_config = toml.load(user_config_file)
+        with Path.open(user_config_location, "rb") as user_config_file:
+            user_config = tomllib.load(user_config_file)
 
     # Merge the configuration
     merger = Merger(
