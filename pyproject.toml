@@ -20,7 +20,7 @@ asyncpg = "0.28.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "3.4.0"
-ruff = "0.0.288"
+ruff = "0.0.289"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
