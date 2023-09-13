@@ -3,11 +3,11 @@
 import asyncio
 import logging
 import os
+import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import coloredlogs
-import toml
 from pydis_core.utils import apply_monkey_patches
 
 from metricity.config import PythonConfig
@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from metricity.bot import Bot
 
 # Read the version from the pyproject.toml file.
-with Path.open("pyproject.toml") as f:
-    package_vers = toml.load(f)["tool"]["poetry"]["version"]
+with Path.open("pyproject.toml", "rb") as f:
+    package_vers = tomllib.load(f)["tool"]["poetry"]["version"]
 
 __version__ = package_vers
 
