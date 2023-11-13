@@ -9,18 +9,18 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "10.3.0"
+pydis-core = "10.4.0"
 
-alembic = "1.12.0"
+alembic = "1.13.0"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.0"
-sqlalchemy = { extras = ["asyncio"], version = "2.0.20" }
+sqlalchemy = { extras = ["asyncio"], version = "2.0.23" }
 python-dotenv = "1.0.0"
-asyncpg = "0.28.0"
+asyncpg = "0.29.0"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "3.4.0"
-ruff = "0.0.291"
+pre-commit = "3.5.0"
+ruff = "0.1.7"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
@@ -32,26 +32,19 @@ build-backend = "poetry.masonry.api"
 [tool.ruff]
 target-version = "py311"
 extend-exclude = [".cache"]
+select = ["ALL"]
 ignore = [
-    "ANN002",
-    "ANN003",
-    "ANN101",
+    "ANN002", "ANN003", "ANN101",
     "C901",
-    "D100",
-    "D104",
-    "D105",
-    "D107",
-    "D203",
-    "D212",
-    "D214",
-    "D215",
-    "D416",
+    "CPY001",
+    "D100", "D104", "D105", "D107", "D203", "D212", "D214", "D215", "D416",
     "EM",
     "PLR0912",
     "TRY003",
 ]
 line-length = 120
-select = ["ALL"]
+unsafe-fixes = true
+preview = true
 
 [tool.ruff.isort]
 order-by-type = false
