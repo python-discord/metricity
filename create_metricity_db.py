@@ -30,7 +30,7 @@ async def create_db() -> None:
             password=parts.password,
         )
     except asyncpg.InvalidCatalogNameError:
-        print("Creating metricity database.") # noqa: T201
+        print("Creating metricity database.")  # noqa: T201
         sys_conn = await asyncpg.connect(
             database="template1",
             user=parts.username,

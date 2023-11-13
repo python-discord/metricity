@@ -29,7 +29,7 @@ class MessageListeners(commands.Cog):
         if message.guild.id != BotConfig.guild_id:
             return
 
-        if message.type in (discord.MessageType.thread_created, discord.MessageType.auto_moderation_action):
+        if message.type in {discord.MessageType.thread_created, discord.MessageType.auto_moderation_action}:
             return
 
         await self.bot.sync_process_complete.wait()

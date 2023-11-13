@@ -9,8 +9,8 @@ from alembic import context
 
 sys.path.append(".")
 
-from metricity.database import build_db_uri # noqa: E402, I001
-from metricity.models import Base # noqa: E402
+from metricity.database import build_db_uri  # noqa: E402
+from metricity.models import Base  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

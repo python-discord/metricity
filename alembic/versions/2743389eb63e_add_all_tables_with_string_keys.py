@@ -41,7 +41,7 @@ def upgrade() -> None:
     sa.Column("name", sa.String(), nullable=False),
     sa.Column("category_id", sa.String(), nullable=True),
     sa.Column("is_staff", sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(["category_id"], ["categories.id"] ),
+    sa.ForeignKeyConstraint(["category_id"], ["categories.id"]),
     sa.PrimaryKeyConstraint("id"),
     )
     op.create_table("messages",

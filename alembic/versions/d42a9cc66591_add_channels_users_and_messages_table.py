@@ -41,8 +41,8 @@ def upgrade() -> None:
     sa.Column("channel_id", sa.BigInteger(), nullable=True),
     sa.Column("author_id", sa.BigInteger(), nullable=True),
     sa.Column("created_at", sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(["author_id"], ["users.id"] ),
-    sa.ForeignKeyConstraint(["channel_id"], ["channels.id"] ),
+    sa.ForeignKeyConstraint(["author_id"], ["users.id"]),
+    sa.ForeignKeyConstraint(["channel_id"], ["channels.id"]),
     sa.PrimaryKeyConstraint("id"),
     )
     # ### end Alembic commands ###
