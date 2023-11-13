@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install Python Dependencies
-      uses: HassanAbouelela/actions/setup-python@setup-python_v1.4.1
+      uses: HassanAbouelela/actions/setup-python@setup-python_v1.4.2
       with:
         python_version: '3.11'
 
@@ -19,4 +19,4 @@ jobs:
       run: SKIP=ruff pre-commit run --all-files
 
     - name: Lint code with ruff
-      run: ruff check --format=github .
+      run: ruff check --output-format=github .
