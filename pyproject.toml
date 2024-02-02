@@ -20,7 +20,7 @@ asyncpg = "0.29.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "3.6.0"
-ruff = "0.1.7"
+ruff = "0.2.0"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"
@@ -32,6 +32,11 @@ build-backend = "poetry.masonry.api"
 [tool.ruff]
 target-version = "py311"
 extend-exclude = [".cache"]
+line-length = 120
+unsafe-fixes = true
+preview = true
+
+[tool.ruff.lint]
 select = ["ALL"]
 ignore = [
     "ANN002", "ANN003", "ANN101",
@@ -42,15 +47,12 @@ ignore = [
     "PLR0912", "PLR6301",
     "TRY003",
 ]
-line-length = 120
-unsafe-fixes = true
-preview = true
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 order-by-type = false
 case-sensitive = true
 combine-as-imports = true
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "metricity/models.py" = ["A003"]
 "alembic/*" = ["INP001"]
