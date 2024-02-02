@@ -9,17 +9,17 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "10.4.0"
+pydis-core = "10.7.0"
 
-alembic = "1.13.0"
+alembic = "1.13.1"
 coloredlogs = "15.0.1"
-deepmerge = "1.1.0"
-sqlalchemy = { extras = ["asyncio"], version = "2.0.23" }
-python-dotenv = "1.0.0"
+deepmerge = "1.1.1"
+sqlalchemy = { extras = ["asyncio"], version = "2.0.25" }
+python-dotenv = "1.0.1"
 asyncpg = "0.29.0"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "3.5.0"
+pre-commit = "3.6.0"
 ruff = "0.1.7"
 
 [tool.poetry.scripts]
