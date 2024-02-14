@@ -14,7 +14,7 @@ pydis-core = "10.7.0"
 alembic = "1.13.1"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.1"
-sqlalchemy = { extras = ["asyncio"], version = "2.0.25" }
+sqlalchemy = { extras = ["asyncio"], version = "2.0.27" }
 python-dotenv = "1.0.1"
 asyncpg = "0.29.0"
 
