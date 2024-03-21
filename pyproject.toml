@@ -9,7 +9,7 @@ license = "MIT"
 python = "3.11.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "10.7.0"
+pydis-core = "11.0.1"
 
 alembic = "1.13.1"
 coloredlogs = "15.0.1"
