@@ -59,7 +59,9 @@ class MessageListeners(commands.Cog):
     async def on_raw_bulk_message_delete(self, messages: discord.RawBulkMessageDeleteEvent) -> None:
         """If messages are deleted in bulk and we have a record of them set the is_deleted flag."""
         async with async_session() as sess:
-            await sess.execute(update(Message).where(Message.id.in_(messages.message_ids)).values(is_deleted=True))
+            await sess.execute(update(Message).where(
+                Message.id.in_([str(mid) for mid in messages.message_ids]),
+            ).values(is_deleted=True))
             await sess.commit()
 
 
