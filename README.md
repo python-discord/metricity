@@ -1,4 +1,4 @@
-![metricity banner](https://media.discordapp.net/attachments/563594791770914816/747917686998040657/metricity_banner.png)
+![Metricity Banner](./docs/banner.png)
 
 Metricity is an application for the Python Discord server which collects advanced metrics on the usage of the server.
 
