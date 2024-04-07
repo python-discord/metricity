@@ -6,21 +6,21 @@ authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "3.11.*"
+python = "3.12.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "10.7.0"
+pydis-core = "11.1.0"
 
 alembic = "1.13.1"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.1"
-sqlalchemy = { extras = ["asyncio"], version = "2.0.25" }
+sqlalchemy = { extras = ["asyncio"], version = "2.0.29" }
 python-dotenv = "1.0.1"
 asyncpg = "0.29.0"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "3.6.0"
-ruff = "0.2.0"
+pre-commit = "3.7.0"
+ruff = "0.3.5"
 
 [tool.poetry.scripts]
 start = "metricity.__main__:start"

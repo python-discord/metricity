@@ -125,7 +125,6 @@ class MemberListeners(commands.Cog):
                 await sess.commit()
 
 
-
 async def setup(bot: Bot) -> None:
     """Load the MemberListeners cog."""
     await bot.add_cog(MemberListeners(bot))

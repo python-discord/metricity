@@ -30,12 +30,14 @@ target_metadata = Base.metadata
 
 config.set_main_option("sqlalchemy.url", build_db_uri())
 
+
 def do_run_migrations(connection: Connection) -> None:
     """Run migrations."""
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 async def run_async_migrations() -> None:
     """Run migrations asynchronously using the asyncpg driver."""
@@ -49,6 +51,7 @@ async def run_async_migrations() -> None:
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()
+
 
 def run_migrations_offline() -> None:
     """

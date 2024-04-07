@@ -13,7 +13,7 @@ jobs:
     - name: Install Python Dependencies
       uses: HassanAbouelela/actions/setup-python@setup-python_v1.4.2
       with:
-        python_version: '3.11'
+        python_version: '3.12'
 
     - name: Run pre-commit hooks
       run: SKIP=ruff pre-commit run --all-files
