@@ -153,11 +153,22 @@ class GuildListeners(commands.Cog):
                             name=channel.name,
                             category_id=category_id,
                             is_staff=is_staff,
+                            deleted=False,
                         ))
 
             await sess.commit()
 
-        log.info("Channel synchronisation process complete, synchronising threads")
+        log.info("Channel synchronisation process complete, synchronising deleted channels")
+
+        async with async_session() as sess:
+            await sess.execute(
+                update(models.Channel)
+                .where(~models.Channel.id.in_([str(channel.id) for channel in guild.channels]))
+                .values(deleted=True),
+            )
+            await sess.commit()
+
+        log.info("Deleted channel synchronisation process complete, synchronising threads")
 
         async with async_session() as sess:
             for thread in guild.threads:
@@ -184,6 +195,14 @@ class GuildListeners(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel: discord.abc.GuildChannel) -> None:
         """Sync the channels when one is created."""
+        if channel.guild.id != BotConfig.guild_id:
+            return
+
+        await self.sync_channels(channel.guild)
+
+    @commands.Cog.listener()
+    async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
+        """Set the deleted flag to true when a channel is deleted."""
         if channel.guild.id != BotConfig.guild_id:
             return
 
