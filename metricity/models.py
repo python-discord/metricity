@@ -30,6 +30,7 @@ class Channel(Base):
     name: Mapped[str]
     category_id: Mapped[str | None] = mapped_column(ForeignKey("categories.id", ondelete="CASCADE"))
     is_staff: Mapped[bool]
+    deleted: Mapped[bool] = mapped_column(default=False)
 
 
 class Thread(Base):
