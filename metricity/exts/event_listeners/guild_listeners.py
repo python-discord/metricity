@@ -16,6 +16,7 @@ from metricity.exts.event_listeners import _utils
 
 log = logging.get_logger(__name__)
 
+
 class GuildListeners(commands.Cog):
     """Listen for guild (and guild channel) events and sync them to the database."""
 

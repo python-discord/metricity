@@ -12,6 +12,7 @@ from metricity.config import DatabaseConfig
 
 log = logging.getLogger(__name__)
 
+
 def build_db_uri() -> str:
     """Build the database uri from the config."""
     if DatabaseConfig.uri:
@@ -27,8 +28,10 @@ def build_db_uri() -> str:
         f"@{DatabaseConfig.host}:{DatabaseConfig.port}/{DatabaseConfig.database}"
     )
 
+
 engine: AsyncEngine = create_async_engine(build_db_uri(), echo=DatabaseConfig.log_queries)
 async_session = async_sessionmaker(engine, expire_on_commit=False)
+
 
 class TZDateTime(TypeDecorator):
     """
