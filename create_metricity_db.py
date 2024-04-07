@@ -1,4 +1,5 @@
 """Ensures the metricity db exists before running migrations."""
+
 import asyncio
 from urllib.parse import SplitResult, urlsplit
 
@@ -17,6 +18,7 @@ def parse_db_url(db_url: str) -> SplitResult:
     )):
         raise ValueError("The given db_url is not a valid PostgreSQL database URL.")
     return db_url_parts
+
 
 async def create_db() -> None:
     """Create the Metricity database if it does not exist."""
@@ -45,5 +47,8 @@ async def create_db() -> None:
 
         await sys_conn.close()
 
+
 if __name__ == "__main__":
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     asyncio.get_event_loop().run_until_complete(create_db())
