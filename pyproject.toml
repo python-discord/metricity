@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metricity"
-version = "2.5.0"
+version = "2.5.1"
 description = "Advanced metric collection for the Python Discord server"
 authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
