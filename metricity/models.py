@@ -19,6 +19,7 @@ class Category(Base):
 
     id: Mapped[str] = mapped_column(primary_key=True)
     name: Mapped[str]
+    deleted: Mapped[bool] = mapped_column(default=False)
 
 
 class Channel(Base):

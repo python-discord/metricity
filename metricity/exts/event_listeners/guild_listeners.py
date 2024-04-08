@@ -128,11 +128,23 @@ class GuildListeners(commands.Cog):
                     if existing_cat := await sess.get(models.Category, str(channel.id)):
                         existing_cat.name = channel.name
                     else:
-                        sess.add(models.Category(id=str(channel.id), name=channel.name))
+                        sess.add(models.Category(id=str(channel.id), name=channel.name, deleted=False))
 
             await sess.commit()
 
-        log.info("Category synchronisation process complete, synchronising channels")
+        log.info("Category synchronisation process complete, synchronising deleted categories")
+
+        async with async_session() as sess:
+            await sess.execute(
+                update(models.Category)
+                .where(~models.Category.id.in_(
+                    [str(channel.id) for channel in guild.channels if isinstance(channel, discord.CategoryChannel)],
+                ))
+                .values(deleted=True),
+            )
+            await sess.commit()
+
+        log.info("Deleted category synchronisation process complete, synchronising channels")
 
         async with async_session() as sess:
             for channel in guild.channels:
