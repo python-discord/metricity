@@ -39,7 +39,7 @@ class StartupSyncer(commands.Cog):
             await sess.execute(update(models.User).values(in_guild=False))
             await sess.commit()
 
-        users = [
+        users = (
             {
                 "id": str(user.id),
                 "name": user.name,
@@ -54,12 +54,12 @@ class StartupSyncer(commands.Cog):
                 "pending": user.pending,
             }
             for user in guild.members
-        ]
+        )
 
         user_chunks = discord.utils.as_chunks(users, 500)
         created = 0
         updated = 0
-        total_users = len(users)
+        total_users = len(guild.members)
 
         log.info("Performing bulk upsert of %d rows in %d chunks", total_users, math.ceil(total_users / 500))
 
