@@ -7,7 +7,7 @@ from sqlalchemy import update
 from metricity.bot import Bot
 from metricity.config import BotConfig
 from metricity.database import async_session
-from metricity.exts.event_listeners import _utils
+from metricity.exts.event_listeners import _syncer_utils
 from metricity.models import Message, User
 
 
@@ -44,7 +44,7 @@ class MessageListeners(commands.Cog):
                 return
 
             from_thread = isinstance(message.channel, discord.Thread)
-            await _utils.sync_message(message, sess, from_thread=from_thread)
+            await _syncer_utils.sync_message(message, sess, from_thread=from_thread)
 
             await sess.commit()
 
