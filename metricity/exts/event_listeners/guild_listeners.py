@@ -12,7 +12,7 @@ from metricity import models
 from metricity.bot import Bot
 from metricity.config import BotConfig
 from metricity.database import async_session
-from metricity.exts.event_listeners import _utils
+from metricity.exts.event_listeners import _syncer_utils
 
 log = logging.get_logger(__name__)
 
@@ -29,10 +29,10 @@ class GuildListeners(commands.Cog):
         await self.bot.wait_until_guild_available()
 
         guild = self.bot.get_guild(self.bot.guild_id)
-        await self.sync_channels(guild)
+        await _syncer_utils.sync_channels(self.bot, guild)
 
         log.info("Beginning thread archive state synchronisation process")
-        await self.sync_thread_archive_state(guild)
+        await _syncer_utils.sync_thread_archive_state(guild)
 
         log.info("Beginning user synchronisation process")
         async with async_session() as sess:
@@ -210,7 +210,7 @@ class GuildListeners(commands.Cog):
         if channel.guild.id != BotConfig.guild_id:
             return
 
-        await self.sync_channels(channel.guild)
+        await _syncer_utils.sync_channels(self.bot, channel.guild)
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel) -> None:
@@ -218,7 +218,7 @@ class GuildListeners(commands.Cog):
         if channel.guild.id != BotConfig.guild_id:
             return
 
-        await self.sync_channels(channel.guild)
+        await _syncer_utils.sync_channels(self.bot, channel.guild)
 
     @commands.Cog.listener()
     async def on_guild_channel_update(
@@ -230,7 +230,7 @@ class GuildListeners(commands.Cog):
         if channel.guild.id != BotConfig.guild_id:
             return
 
-        await self.sync_channels(channel.guild)
+        await _syncer_utils.sync_channels(self.bot, channel.guild)
 
     @commands.Cog.listener()
     async def on_thread_create(self, thread: discord.Thread) -> None:
@@ -238,7 +238,7 @@ class GuildListeners(commands.Cog):
         if thread.guild.id != BotConfig.guild_id:
             return
 
-        await self.sync_channels(thread.guild)
+        await _syncer_utils.sync_channels(self.bot, thread.guild)
 
     @commands.Cog.listener()
     async def on_thread_update(self, _before: discord.Thread, thread: discord.Thread) -> None:
@@ -246,7 +246,7 @@ class GuildListeners(commands.Cog):
         if thread.guild.id != BotConfig.guild_id:
             return
 
-        await self.sync_channels(thread.guild)
+        await _syncer_utils.sync_channels(self.bot, thread.guild)
 
     @commands.Cog.listener()
     async def on_guild_available(self, guild: discord.Guild) -> None:

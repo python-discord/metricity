@@ -1,7 +1,10 @@
 import discord
+from pydis_core.utils import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from metricity import models
+
+log = logging.get_logger(__name__)
 
 
 def insert_thread(thread: discord.Thread, sess: AsyncSession) -> None:
