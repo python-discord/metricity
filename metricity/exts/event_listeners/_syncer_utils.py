@@ -113,11 +113,7 @@ async def sync_channels(bot: Bot, guild: discord.Guild) -> None:
 
     async with async_session() as sess:
         for thread in guild.threads:
-            if thread.parent and thread.parent.category:
-                if thread.parent.category.id in BotConfig.ignore_categories:
-                    continue
-            else:
-                # This is a forum channel, not currently supported by Discord.py. Ignore it.
+            if thread.parent and thread.parent.category and thread.parent.category.id in BotConfig.ignore_categories:
                 continue
 
             if db_thread := await sess.get(models.Thread, str(thread.id)):
@@ -130,6 +126,8 @@ async def sync_channels(bot: Bot, guild: discord.Guild) -> None:
                 insert_thread(thread, sess)
         await sess.commit()
 
+    log.info("Thread synchronisation process complete, synchronising deleted threads")
+    await sync_thread_archive_state(guild)
     log.info("Thread synchronisation process complete, finished synchronising guild.")
     bot.channel_sync_in_progress.set()
 
