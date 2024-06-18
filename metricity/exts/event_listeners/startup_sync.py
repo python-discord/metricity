@@ -35,9 +35,6 @@ class StartupSyncer(commands.Cog):
         await _syncer_utils.sync_thread_archive_state(guild)
 
         log.info("Beginning user synchronisation process")
-        async with async_session() as sess:
-            await sess.execute(update(models.User).values(in_guild=False))
-            await sess.commit()
 
         users = (
             {
@@ -89,11 +86,25 @@ class StartupSyncer(commands.Cog):
                 created += [obj[0] == 0 for obj in objs].count(True)
                 updated += [obj[0] != 0 for obj in objs].count(True)
 
-                log.info("User upsert: inserted %d rows, updated %d rows, done %d rows, %d rows remaining",
-                         created, updated, created + updated, total_users - (created + updated))
+                log.info(
+                    "User upsert: inserted %d rows, updated %d rows, done %d rows, %d rows remaining",
+                    created,
+                    updated,
+                    created + updated,
+                    total_users - (created + updated),
+                )
 
             await sess.commit()
 
+        log.info("Syncing user in-guild status")
+        in_guild_user_ids = {str(member.id) for member in guild.members}
+        async with async_session() as sess:
+            await sess.execute(
+                update(models.User)
+                .where(~models.User.id.in_(in_guild_user_ids))
+                .values(in_guild=False),
+            )
+            await sess.commit()
         log.info("User upsert complete")
 
         self.bot.sync_process_complete.set()
