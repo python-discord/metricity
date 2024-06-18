@@ -1,0 +1,17 @@
+# Exclude everything
+*
+
+# Make exceptions for what's needed
+!metricity
+
+!pyproject.toml
+!poetry.lock
+!LICENSE
+
+!config.toml
+!config-default.toml
+!alembic
+!alembic.ini
+
+!create_metricity_db.py
+!entry_point.sh
