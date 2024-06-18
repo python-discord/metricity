@@ -22,9 +22,6 @@ asyncpg = "0.29.0"
 pre-commit = "3.7.1"
 ruff = "0.4.9"
 
-[tool.poetry.scripts]
-start = "metricity.__main__:start"
-
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"

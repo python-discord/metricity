@@ -44,6 +44,4 @@ async def main() -> None:
             await _bot.start(BotConfig.token)
 
 
-def start() -> None:
-    """Start the Metricity application."""
-    asyncio.run(main())
+asyncio.run(main())

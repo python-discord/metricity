@@ -10,5 +10,5 @@ fi
 
 shopt -s nocasematch
 if [ "${USE_METRICITY:-true}" = "true" ]; then
-    poetry run start
+    poetry run python -m metricity
 fi
