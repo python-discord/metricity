@@ -5,8 +5,8 @@ ENV PYTHONHASHSEED=random
 # Install Dependencies
 WORKDIR /metricity
 COPY poetry.lock pyproject.toml ./
-RUN poetry install
+RUN poetry install --without dev
 
 
-COPY . /metricity
+COPY . .
 CMD ["bash", "entry_point.sh"]
