@@ -1,6 +1,7 @@
 """An ext to sync the guild when the bot starts up."""
 
 import math
+import time
 
 import discord
 from discord.ext import commands
@@ -25,7 +26,7 @@ class StartupSyncer(commands.Cog):
         self.bot = bot
         scheduling.create_task(self.sync_guild())
 
-    async def sync_guild(self) -> None:
+    async def sync_guild(self) -> None:  # noqa: PLR0914
         """Sync all channels and members in the guild."""
         await self.bot.wait_until_guild_available()
 
@@ -96,16 +97,30 @@ class StartupSyncer(commands.Cog):
         users_updated = 0
         guild_member_ids = {str(member.id) for member in guild.members}
         async with async_session() as sess:
+            start = time.perf_counter()
 
             stmt = select(models.User).filter_by(in_guild=True).options(load_only(models.User.id))
             res = await sess.execute(stmt)
             in_guild_users = res.scalars()
+            query = time.perf_counter()
+
             for user in in_guild_users:
                 if user.id not in guild_member_ids:
                     users_updated += 1
                     user.in_guild = False
+            proc = time.perf_counter()
+
             await sess.commit()
-        log.info("User in_guild sync updated  %d users to be off guild", users_updated)
+            end = time.perf_counter()
+
+            log.debug(
+                "in_guild sync: total time %fs, query %fs, processing %fs, commit %fs",
+                end - start,
+                query - start,
+                proc - query,
+                end - proc,
+            )
+        log.info("User in_guild sync updated %d users to be off guild", users_updated)
         log.info("User sync complete")
 
         self.bot.sync_process_complete.set()
