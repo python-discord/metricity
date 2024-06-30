@@ -9,12 +9,12 @@ license = "MIT"
 python = "3.12.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "11.1.0"
+pydis-core = "11.2.0"
 
-alembic = "1.13.1"
+alembic = "1.13.2"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.1"
-sqlalchemy = { extras = ["asyncio"], version = "2.0.30" }
+sqlalchemy = { extras = ["asyncio"], version = "2.0.31" }
 python-dotenv = "1.0.1"
 asyncpg = "0.29.0"
 
