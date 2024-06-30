@@ -11,7 +11,7 @@ python = "3.12.*"
 # See https://bot-core.pythondiscord.com/ for docs.
 pydis-core = "11.1.0"
 
-alembic = "1.13.1"
+alembic = "1.13.2"
 coloredlogs = "15.0.1"
 deepmerge = "1.1.1"
 sqlalchemy = { extras = ["asyncio"], version = "2.0.30" }
