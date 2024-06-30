@@ -7,6 +7,7 @@ from discord.ext import commands
 from pydis_core.utils import logging, scheduling
 from sqlalchemy import column, select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import load_only
 
 from metricity import models
 from metricity.bot import Bot
@@ -95,7 +96,9 @@ class StartupSyncer(commands.Cog):
         users_updated = 0
         guild_member_ids = {str(member.id) for member in guild.members}
         async with async_session() as sess:
-            res = await sess.execute(select(models.User).filter_by(in_guild=True))
+
+            stmt = select(models.User).filter_by(in_guild=True).options(load_only(models.User.id))
+            res = await sess.execute(stmt)
             in_guild_users = res.scalars()
             for user in in_guild_users:
                 if user.id not in guild_member_ids:
