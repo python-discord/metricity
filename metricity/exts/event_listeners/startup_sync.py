@@ -1,12 +1,14 @@
 """An ext to sync the guild when the bot starts up."""
 
 import math
+import time
 
 import discord
 from discord.ext import commands
 from pydis_core.utils import logging, scheduling
-from sqlalchemy import column, update
+from sqlalchemy import column, select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import load_only
 
 from metricity import models
 from metricity.bot import Bot
@@ -24,7 +26,7 @@ class StartupSyncer(commands.Cog):
         self.bot = bot
         scheduling.create_task(self.sync_guild())
 
-    async def sync_guild(self) -> None:
+    async def sync_guild(self) -> None:  # noqa: PLR0914
         """Sync all channels and members in the guild."""
         await self.bot.wait_until_guild_available()
 
@@ -35,10 +37,6 @@ class StartupSyncer(commands.Cog):
         await _syncer_utils.sync_thread_archive_state(guild)
 
         log.info("Beginning user synchronisation process")
-        async with async_session() as sess:
-            await sess.execute(update(models.User).values(in_guild=False))
-            await sess.commit()
-
         users = (
             {
                 "id": str(user.id),
@@ -85,7 +83,6 @@ class StartupSyncer(commands.Cog):
                 ))
 
                 objs = list(res)
-
                 created += [obj[0] == 0 for obj in objs].count(True)
                 updated += [obj[0] != 0 for obj in objs].count(True)
 
@@ -95,6 +92,36 @@ class StartupSyncer(commands.Cog):
             await sess.commit()
 
         log.info("User upsert complete")
+        log.info("Beginning user in_guild sync")
+
+        users_updated = 0
+        guild_member_ids = {str(member.id) for member in guild.members}
+        async with async_session() as sess:
+            start = time.perf_counter()
+
+            stmt = select(models.User).filter_by(in_guild=True).options(load_only(models.User.id))
+            res = await sess.execute(stmt)
+            in_guild_users = res.scalars()
+            query = time.perf_counter()
+
+            for user in in_guild_users:
+                if user.id not in guild_member_ids:
+                    users_updated += 1
+                    user.in_guild = False
+            proc = time.perf_counter()
+
+            await sess.commit()
+            end = time.perf_counter()
+
+            log.debug(
+                "in_guild sync: total time %fs, query %fs, processing %fs, commit %fs",
+                end - start,
+                query - start,
+                proc - query,
+                end - proc,
+            )
+        log.info("User in_guild sync updated %d users to be off guild", users_updated)
+        log.info("User sync complete")
 
         self.bot.sync_process_complete.set()
 
