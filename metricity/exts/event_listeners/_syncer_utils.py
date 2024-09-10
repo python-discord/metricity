@@ -33,7 +33,7 @@ async def sync_message(message: discord.Message, sess: AsyncSession, *, from_thr
     if await sess.get(models.Message, str(message.id)):
         return
 
-    hash_ctx = hashlib.md5() # noqa: S324
+    hash_ctx = hashlib.md5()  # noqa: S324
     hash_ctx.update(message.content.encode())
     digest = hash_ctx.digest()
     digest_encoded = binascii.hexlify(digest).decode()
