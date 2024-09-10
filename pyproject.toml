@@ -4,6 +4,7 @@ version = "2.7.0"
 description = "Advanced metric collection for the Python Discord server"
 authors = ["Joe Banks <joseph@josephbanks.me>"]
 license = "MIT"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "3.12.*"
