@@ -32,6 +32,7 @@ extend-exclude = [".cache"]
 line-length = 120
 unsafe-fixes = true
 preview = false
+output-format = "concise"
 
 [tool.ruff.lint]
 select = ["ALL"]
