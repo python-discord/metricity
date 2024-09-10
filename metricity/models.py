@@ -78,3 +78,4 @@ class Message(Base):
     author_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     created_at = mapped_column(TZDateTime())
     is_deleted: Mapped[bool] = mapped_column(default=False)
+    content_hash: Mapped[str] = mapped_column(nullable=True)

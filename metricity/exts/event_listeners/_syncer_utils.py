@@ -1,3 +1,6 @@
+import binascii
+import hashlib
+
 import discord
 from pydis_core.utils import logging
 from sqlalchemy import update
@@ -30,11 +33,17 @@ async def sync_message(message: discord.Message, sess: AsyncSession, *, from_thr
     if await sess.get(models.Message, str(message.id)):
         return
 
+    hash_ctx = hashlib.md5()  # noqa: S324
+    hash_ctx.update(message.content.encode())
+    digest = hash_ctx.digest()
+    digest_encoded = binascii.hexlify(digest).decode()
+
     args = {
         "id": str(message.id),
         "channel_id": str(message.channel.id),
         "author_id": str(message.author.id),
         "created_at": message.created_at,
+        "content_hash": digest_encoded,
     }
 
     if from_thread:

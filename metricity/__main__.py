@@ -24,6 +24,7 @@ async def main() -> None:
         voice_states=False,
         presences=False,
         messages=True,
+        message_content=True,
         reactions=False,
         typing=False,
     )
