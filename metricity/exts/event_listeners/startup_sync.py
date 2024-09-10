@@ -26,7 +26,7 @@ class StartupSyncer(commands.Cog):
         self.bot = bot
         scheduling.create_task(self.sync_guild())
 
-    async def sync_guild(self) -> None:  # noqa: PLR0914
+    async def sync_guild(self) -> None:
         """Sync all channels and members in the guild."""
         await self.bot.wait_until_guild_available()
 
