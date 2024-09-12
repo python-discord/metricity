@@ -10,7 +10,7 @@ package-mode = false
 python = "3.12.*"
 
 # See https://bot-core.pythondiscord.com/ for docs.
-pydis-core = "11.3.1"
+pydis-core = "11.4.0"
 
 alembic = "1.13.2"
 coloredlogs = "15.0.1"
