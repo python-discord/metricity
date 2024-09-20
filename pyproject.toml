@@ -21,7 +21,7 @@ asyncpg = "0.29.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "3.8.0"
-ruff = "0.6.4"
+ruff = "0.6.6"
 
 [build-system]
 requires = ["poetry>=0.12"]
